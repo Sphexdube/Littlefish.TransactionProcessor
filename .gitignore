@@ -21,3 +21,5 @@ _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
 /src/.idea
+.DS_Store
+build/
