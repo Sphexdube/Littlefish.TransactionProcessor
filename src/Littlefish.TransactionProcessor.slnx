@@ -1,0 +1,18 @@
+<Solution>
+  <Project Path="../test/Transaction.Tests.Integration/Transaction.Tests.Integration.csproj" />
+  <Project Path="../test/Transaction.Tests.Unit/Transaction.Tests.Unit.csproj" />
+  <Project Path="Littlefish.TransactionProcessor.ServiceDefaults/Littlefish.TransactionProcessor.ServiceDefaults.csproj" />
+  <Project Path="Transaction.Application.Constants/Transaction.Application.Constants.csproj" />
+  <Project Path="Transaction.Application.Handlers/Transaction.Application.Handlers.csproj" />
+  <Project Path="Transaction.Application.Models/Transaction.Application.Models.csproj" />
+  <Project Path="Transaction.Application.Validators/Transaction.Application.Validators.csproj" />
+  <Project Path="Transaction.Domain.Commands/Transaction.Domain.Commands.csproj" />
+  <Project Path="Transaction.Domain.Entities/Transaction.Domain.Entities.csproj" />
+  <Project Path="Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj" />
+  <Project Path="Transaction.Domain.Observability/Transaction.Domain.Observability.csproj" />
+  <Project Path="Transaction.Domain.Rules/Transaction.Domain.Rules.csproj" />
+  <Project Path="Transaction.Infrastructure.Messaging/Transaction.Infrastructure.Messaging.csproj" />
+  <Project Path="Transaction.Infrastructure.Persistence/Transaction.Infrastructure.Persistence.csproj" />
+  <Project Path="Transaction.Presentation.Api/Transaction.Presentation.Api.csproj" />
+  <Project Path="Transaction.Worker.Processor/Transaction.Worker.Processor.csproj" />
+</Solution>
