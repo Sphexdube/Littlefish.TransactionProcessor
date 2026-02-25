@@ -1,0 +1,181 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0": {
+      "Transaction.Application.Constants/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/Transaction.Application.Constants.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Transaction.Application.Constants.dll": {}
+        }
+      },
+      "Transaction.Application.Models/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Transaction.Domain.Entities": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Transaction.Application.Models.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Transaction.Application.Models.dll": {}
+        }
+      },
+      "Transaction.Domain.Entities/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/Transaction.Domain.Entities.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Transaction.Domain.Entities.dll": {}
+        }
+      },
+      "Transaction.Domain.Interfaces/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Transaction.Domain.Entities": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Transaction.Domain.Interfaces.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Transaction.Domain.Interfaces.dll": {}
+        }
+      },
+      "Transaction.Domain.Rules/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Transaction.Domain.Entities": "1.0.0",
+          "Transaction.Domain.Interfaces": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Transaction.Domain.Rules.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Transaction.Domain.Rules.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Transaction.Application.Constants/1.0.0": {
+      "type": "project",
+      "path": "../Transaction.Application.Constants/Transaction.Application.Constants.csproj",
+      "msbuildProject": "../Transaction.Application.Constants/Transaction.Application.Constants.csproj"
+    },
+    "Transaction.Application.Models/1.0.0": {
+      "type": "project",
+      "path": "../Transaction.Application.Models/Transaction.Application.Models.csproj",
+      "msbuildProject": "../Transaction.Application.Models/Transaction.Application.Models.csproj"
+    },
+    "Transaction.Domain.Entities/1.0.0": {
+      "type": "project",
+      "path": "../Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
+      "msbuildProject": "../Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
+    },
+    "Transaction.Domain.Interfaces/1.0.0": {
+      "type": "project",
+      "path": "../Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
+      "msbuildProject": "../Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
+    },
+    "Transaction.Domain.Rules/1.0.0": {
+      "type": "project",
+      "path": "../Transaction.Domain.Rules/Transaction.Domain.Rules.csproj",
+      "msbuildProject": "../Transaction.Domain.Rules/Transaction.Domain.Rules.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0": [
+      "Transaction.Application.Constants >= 1.0.0",
+      "Transaction.Application.Models >= 1.0.0",
+      "Transaction.Domain.Entities >= 1.0.0",
+      "Transaction.Domain.Interfaces >= 1.0.0",
+      "Transaction.Domain.Rules >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/Users/siphesihledube/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj",
+      "projectName": "Transaction.Application.Handlers",
+      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj",
+      "packagesPath": "/Users/siphesihledube/.nuget/packages/",
+      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Handlers/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "projectReferences": {
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj"
+            },
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj"
+            },
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
+            },
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
+            },
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net9.0": {
+        "targetAlias": "net9.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.311/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
