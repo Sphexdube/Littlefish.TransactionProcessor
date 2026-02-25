@@ -1,20 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hujIa1QAN3I=",
-  "success": false,
+  "dgSpecHash": "I+5zi9US1e8=",
+  "success": true,
   "projectFilePath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
   "expectedPackageFiles": [],
-  "logs": [
-    {
-      "code": "NU1104",
-      "level": "Error",
-      "message": "Unable to find project '/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj'. Check that the project reference is valid and that the project file exists.",
-      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
-      "filePath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
-      "libraryId": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  "logs": []
 }

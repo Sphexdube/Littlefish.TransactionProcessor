@@ -1,49 +1,11 @@
 {
   "version": 3,
   "targets": {
-    "net9.0": {
-      "Transaction.Domain.Entities/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "compile": {
-          "bin/placeholder/Transaction.Domain.Entities.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Domain.Entities.dll": {}
-        }
-      },
-      "Transaction.Domain.Interfaces/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "dependencies": {
-          "Transaction.Domain.Entities": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Transaction.Domain.Interfaces.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Domain.Interfaces.dll": {}
-        }
-      }
-    }
+    "net9.0": {}
   },
-  "libraries": {
-    "Transaction.Domain.Entities/1.0.0": {
-      "type": "project",
-      "path": "../Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
-      "msbuildProject": "../Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
-    },
-    "Transaction.Domain.Interfaces/1.0.0": {
-      "type": "project",
-      "path": "../Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
-      "msbuildProject": "../Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
-    }
-  },
+  "libraries": {},
   "projectFileDependencyGroups": {
-    "net9.0": [
-      "Transaction.Domain.Entities >= 1.0.0",
-      "Transaction.Domain.Interfaces >= 1.0.0"
-    ]
+    "net9.0": []
   },
   "packageFolders": {
     "/Users/siphesihledube/.nuget/packages/": {}
@@ -69,14 +31,7 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
-            },
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
