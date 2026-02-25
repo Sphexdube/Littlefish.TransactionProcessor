@@ -1,19 +1,23 @@
-# OS
-.DS_Store
-
-# IDE
-.idea/
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
 .vs/
 
-# .NET build outputs
-**/bin/
-**/obj/
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+[Bb]in/
+[Oo]bj/
+[Pp]ublish/
 
-# Test and coverage artifacts
-TestResults/
-coverage/
-*.coverage
-*.trx
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
 
-# Logs
-*.log
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+/src/.idea
