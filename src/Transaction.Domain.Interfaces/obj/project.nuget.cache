@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hYdEySgTmIk=",
+  "dgSpecHash": "HLj04+YNLHs=",
   "success": true,
-  "projectFilePath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
+  "projectFilePath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

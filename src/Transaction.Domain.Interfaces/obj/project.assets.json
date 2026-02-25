@@ -32,11 +32,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
+      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
       "projectName": "Transaction.Domain.Interfaces",
-      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
+      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
       "packagesPath": "/Users/siphesihledube/.nuget/packages/",
-      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Interfaces/obj/",
+      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"
@@ -51,8 +51,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
             }
           }
         }

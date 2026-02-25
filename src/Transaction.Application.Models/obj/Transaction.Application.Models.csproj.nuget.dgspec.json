@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {}
+    "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {}
   },
   "projects": {
-    "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {
+    "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
+        "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
         "projectName": "Transaction.Application.Models",
-        "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
+        "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
         "packagesPath": "/Users/siphesihledube/.nuget/packages/",
-        "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/obj/",
+        "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"
@@ -26,8 +26,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
-                "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
+              "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": {
+                "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj"
+              },
+              "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
+                "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
               }
             }
           }
@@ -67,14 +70,14 @@
         }
       }
     },
-    "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
+    "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
+        "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
         "projectName": "Transaction.Domain.Entities",
-        "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
+        "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
         "packagesPath": "/Users/siphesihledube/.nuget/packages/",
-        "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/obj/",
+        "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"

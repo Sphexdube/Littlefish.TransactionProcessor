@@ -23,6 +23,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
       "Transaction.Domain.Entities >= 1.0.0"
     ]
   },
@@ -32,11 +33,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
+      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
       "projectName": "Transaction.Application.Models",
-      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
+      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
       "packagesPath": "/Users/siphesihledube/.nuget/packages/",
-      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/obj/",
+      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"
@@ -51,8 +52,11 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj"
+            },
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
             }
           }
         }
@@ -91,5 +95,16 @@
         "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.311/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1104",
+      "level": "Error",
+      "message": "Unable to find project '/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj'. Check that the project reference is valid and that the project file exists.",
+      "libraryId": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
+      "targetGraphs": [
+        "net9.0"
+      ]
+    }
+  ]
 }

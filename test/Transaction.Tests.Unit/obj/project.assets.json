@@ -8,36 +8,6 @@
           "build/netstandard2.0/coverlet.collector.targets": {}
         }
       },
-      "FluentValidation/11.11.0": {
-        "type": "package",
-        "compile": {
-          "lib/net8.0/FluentValidation.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/FluentValidation.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "FluentValidation.DependencyInjectionExtensions/11.11.0": {
-        "type": "package",
-        "dependencies": {
-          "FluentValidation": "11.11.0",
-          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
-        },
-        "compile": {
-          "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.dll": {
-            "related": ".xml"
-          }
-        }
-      },
       "Microsoft.CodeCoverage/17.12.0": {
         "type": "package",
         "compile": {
@@ -49,19 +19,6 @@
         "build": {
           "build/netstandard2.0/Microsoft.CodeCoverage.props": {},
           "build/netstandard2.0/Microsoft.CodeCoverage.targets": {}
-        }
-      },
-      "Microsoft.Extensions.DependencyInjection.Abstractions/2.1.0": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
-            "related": ".xml"
-          }
         }
       },
       "Microsoft.NET.Test.Sdk/17.12.0": {
@@ -389,112 +346,6 @@
             "related": ".xml"
           }
         }
-      },
-      "Transaction.Application.Constants/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "compile": {
-          "bin/placeholder/Transaction.Application.Constants.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Application.Constants.dll": {}
-        }
-      },
-      "Transaction.Application.Handlers/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "dependencies": {
-          "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": "1.0.0",
-          "Transaction.Application.Constants": "1.0.0",
-          "Transaction.Application.Models": "1.0.0",
-          "Transaction.Domain.Entities": "1.0.0",
-          "Transaction.Domain.Interfaces": "1.0.0",
-          "Transaction.Domain.Observability": "1.0.0",
-          "Transaction.Domain.Rules": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Transaction.Application.Handlers.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Application.Handlers.dll": {}
-        }
-      },
-      "Transaction.Application.Models/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "dependencies": {
-          "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": "1.0.0",
-          "Transaction.Domain.Entities": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Transaction.Application.Models.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Application.Models.dll": {}
-        }
-      },
-      "Transaction.Application.Validators/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "dependencies": {
-          "FluentValidation": "11.11.0",
-          "FluentValidation.DependencyInjectionExtensions": "11.11.0",
-          "Transaction.Application.Constants": "1.0.0",
-          "Transaction.Application.Models": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Transaction.Application.Validators.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Application.Validators.dll": {}
-        }
-      },
-      "Transaction.Domain.Entities/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "compile": {
-          "bin/placeholder/Transaction.Domain.Entities.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Domain.Entities.dll": {}
-        }
-      },
-      "Transaction.Domain.Interfaces/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "dependencies": {
-          "Transaction.Domain.Entities": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Transaction.Domain.Interfaces.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Domain.Interfaces.dll": {}
-        }
-      },
-      "Transaction.Domain.Observability/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "compile": {
-          "bin/placeholder/Transaction.Domain.Observability.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Domain.Observability.dll": {}
-        }
-      },
-      "Transaction.Domain.Rules/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v9.0",
-        "dependencies": {
-          "Transaction.Domain.Entities": "1.0.0",
-          "Transaction.Domain.Interfaces": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Transaction.Domain.Rules.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Transaction.Domain.Rules.dll": {}
-        }
       }
     }
   },
@@ -569,48 +420,6 @@
         "coverlet.collector.nuspec"
       ]
     },
-    "FluentValidation/11.11.0": {
-      "sha512": "cyIVdQBwSipxWG8MA3Rqox7iNbUNUTK5bfJi9tIdm4CAfH71Oo5ABLP4/QyrUwuakqpUEPGtE43BDddvEehuYw==",
-      "type": "package",
-      "path": "fluentvalidation/11.11.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "fluent-validation-icon.png",
-        "fluentvalidation.11.11.0.nupkg.sha512",
-        "fluentvalidation.nuspec",
-        "lib/net5.0/FluentValidation.dll",
-        "lib/net5.0/FluentValidation.xml",
-        "lib/net6.0/FluentValidation.dll",
-        "lib/net6.0/FluentValidation.xml",
-        "lib/net7.0/FluentValidation.dll",
-        "lib/net7.0/FluentValidation.xml",
-        "lib/net8.0/FluentValidation.dll",
-        "lib/net8.0/FluentValidation.xml",
-        "lib/netstandard2.0/FluentValidation.dll",
-        "lib/netstandard2.0/FluentValidation.xml",
-        "lib/netstandard2.1/FluentValidation.dll",
-        "lib/netstandard2.1/FluentValidation.xml"
-      ]
-    },
-    "FluentValidation.DependencyInjectionExtensions/11.11.0": {
-      "sha512": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
-      "type": "package",
-      "path": "fluentvalidation.dependencyinjectionextensions/11.11.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "fluent-validation-icon.png",
-        "fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512",
-        "fluentvalidation.dependencyinjectionextensions.nuspec",
-        "lib/netstandard2.0/FluentValidation.DependencyInjectionExtensions.dll",
-        "lib/netstandard2.0/FluentValidation.DependencyInjectionExtensions.xml",
-        "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.dll",
-        "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.xml"
-      ]
-    },
     "Microsoft.CodeCoverage/17.12.0": {
       "sha512": "4svMznBd5JM21JIG2xZKGNanAHNXplxf/kQDFfLHXQ3OnpJkayRK/TjacFjA+EYmoyuNXHo/sOETEfcYtAzIrA==",
       "type": "package",
@@ -675,19 +484,6 @@
         "lib/netcoreapp3.1/Microsoft.VisualStudio.CodeCoverage.Shim.dll",
         "microsoft.codecoverage.17.12.0.nupkg.sha512",
         "microsoft.codecoverage.nuspec"
-      ]
-    },
-    "Microsoft.Extensions.DependencyInjection.Abstractions/2.1.0": {
-      "sha512": "8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ==",
-      "type": "package",
-      "path": "microsoft.extensions.dependencyinjection.abstractions/2.1.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
-        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
-        "microsoft.extensions.dependencyinjection.abstractions.2.1.0.nupkg.sha512",
-        "microsoft.extensions.dependencyinjection.abstractions.nuspec"
       ]
     },
     "Microsoft.NET.Test.Sdk/17.12.0": {
@@ -997,46 +793,6 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
-    },
-    "Transaction.Application.Constants/1.0.0": {
-      "type": "project",
-      "path": "../../src/Transaction.Application.Constants/Transaction.Application.Constants.csproj",
-      "msbuildProject": "../../src/Transaction.Application.Constants/Transaction.Application.Constants.csproj"
-    },
-    "Transaction.Application.Handlers/1.0.0": {
-      "type": "project",
-      "path": "../../src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj",
-      "msbuildProject": "../../src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj"
-    },
-    "Transaction.Application.Models/1.0.0": {
-      "type": "project",
-      "path": "../../src/Transaction.Application.Models/Transaction.Application.Models.csproj",
-      "msbuildProject": "../../src/Transaction.Application.Models/Transaction.Application.Models.csproj"
-    },
-    "Transaction.Application.Validators/1.0.0": {
-      "type": "project",
-      "path": "../../src/Transaction.Application.Validators/Transaction.Application.Validators.csproj",
-      "msbuildProject": "../../src/Transaction.Application.Validators/Transaction.Application.Validators.csproj"
-    },
-    "Transaction.Domain.Entities/1.0.0": {
-      "type": "project",
-      "path": "../../src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
-      "msbuildProject": "../../src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
-    },
-    "Transaction.Domain.Interfaces/1.0.0": {
-      "type": "project",
-      "path": "../../src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
-      "msbuildProject": "../../src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
-    },
-    "Transaction.Domain.Observability/1.0.0": {
-      "type": "project",
-      "path": "../../src/Transaction.Domain.Observability/Transaction.Domain.Observability.csproj",
-      "msbuildProject": "../../src/Transaction.Domain.Observability/Transaction.Domain.Observability.csproj"
-    },
-    "Transaction.Domain.Rules/1.0.0": {
-      "type": "project",
-      "path": "../../src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj",
-      "msbuildProject": "../../src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -1045,10 +801,6 @@
       "NUnit >= 4.2.2",
       "NUnit.Analyzers >= 4.4.0",
       "NUnit3TestAdapter >= 4.6.0",
-      "Transaction.Application.Handlers >= 1.0.0",
-      "Transaction.Application.Validators >= 1.0.0",
-      "Transaction.Domain.Entities >= 1.0.0",
-      "Transaction.Domain.Rules >= 1.0.0",
       "coverlet.collector >= 6.0.2"
     ]
   },
@@ -1076,20 +828,7 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj"
-            },
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Validators/Transaction.Application.Validators.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Validators/Transaction.Application.Validators.csproj"
-            },
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
-            },
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
@@ -1148,16 +887,5 @@
         "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.311/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1105",
-      "level": "Error",
-      "message": "Unable to find project information for '/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj'. If you are using Visual Studio, this may be because the project is unloaded or not part of the current solution so run a restore from the command-line. Otherwise, the project file may be invalid or missing targets required for restore.",
-      "libraryId": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  }
 }

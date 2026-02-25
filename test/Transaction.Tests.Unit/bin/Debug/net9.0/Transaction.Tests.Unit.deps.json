@@ -12,10 +12,6 @@
           "NUnit": "4.2.2",
           "NUnit.Analyzers": "4.4.0",
           "NUnit3TestAdapter": "4.6.0",
-          "Transaction.Application.Handlers": "1.0.0",
-          "Transaction.Application.Validators": "1.0.0",
-          "Transaction.Domain.Entities": "1.0.0",
-          "Transaction.Domain.Rules": "1.0.0",
           "coverlet.collector": "6.0.2"
         },
         "runtime": {
@@ -23,39 +19,11 @@
         }
       },
       "coverlet.collector/6.0.2": {},
-      "FluentValidation/11.11.0": {
-        "runtime": {
-          "lib/net8.0/FluentValidation.dll": {
-            "assemblyVersion": "11.0.0.0",
-            "fileVersion": "11.11.0.0"
-          }
-        }
-      },
-      "FluentValidation.DependencyInjectionExtensions/11.11.0": {
-        "dependencies": {
-          "FluentValidation": "11.11.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "2.1.0"
-        },
-        "runtime": {
-          "lib/netstandard2.1/FluentValidation.DependencyInjectionExtensions.dll": {
-            "assemblyVersion": "11.0.0.0",
-            "fileVersion": "11.11.0.0"
-          }
-        }
-      },
       "Microsoft.CodeCoverage/17.12.0": {
         "runtime": {
           "lib/netcoreapp3.1/Microsoft.VisualStudio.CodeCoverage.Shim.dll": {
             "assemblyVersion": "15.0.0.0",
             "fileVersion": "17.1200.524.48002"
-          }
-        }
-      },
-      "Microsoft.Extensions.DependencyInjection.Abstractions/2.1.0": {
-        "runtime": {
-          "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
-            "assemblyVersion": "2.1.0.0",
-            "fileVersion": "2.1.0.18136"
           }
         }
       },
@@ -333,86 +301,7 @@
       },
       "NUnit.Analyzers/4.4.0": {},
       "NUnit3TestAdapter/4.6.0": {},
-      "System.Reflection.Metadata/1.6.0": {},
-      "Transaction.Application.Constants/1.0.0": {
-        "runtime": {
-          "Transaction.Application.Constants.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "Transaction.Application.Handlers/1.0.0": {
-        "dependencies": {
-          "Transaction.Application.Constants": "1.0.0",
-          "Transaction.Application.Models": "1.0.0",
-          "Transaction.Domain.Entities": "1.0.0",
-          "Transaction.Domain.Interfaces": "1.0.0",
-          "Transaction.Domain.Rules": "1.0.0"
-        },
-        "runtime": {
-          "Transaction.Application.Handlers.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "Transaction.Application.Models/1.0.0": {
-        "dependencies": {
-          "Transaction.Domain.Entities": "1.0.0"
-        },
-        "runtime": {
-          "Transaction.Application.Models.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "Transaction.Application.Validators/1.0.0": {
-        "dependencies": {
-          "FluentValidation": "11.11.0",
-          "FluentValidation.DependencyInjectionExtensions": "11.11.0",
-          "Transaction.Application.Constants": "1.0.0",
-          "Transaction.Application.Models": "1.0.0"
-        },
-        "runtime": {
-          "Transaction.Application.Validators.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "Transaction.Domain.Entities/1.0.0": {
-        "runtime": {
-          "Transaction.Domain.Entities.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "Transaction.Domain.Interfaces/1.0.0": {
-        "dependencies": {
-          "Transaction.Domain.Entities": "1.0.0"
-        },
-        "runtime": {
-          "Transaction.Domain.Interfaces.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      },
-      "Transaction.Domain.Rules/1.0.0": {
-        "dependencies": {
-          "Transaction.Domain.Entities": "1.0.0",
-          "Transaction.Domain.Interfaces": "1.0.0"
-        },
-        "runtime": {
-          "Transaction.Domain.Rules.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
-      }
+      "System.Reflection.Metadata/1.6.0": {}
     }
   },
   "libraries": {
@@ -428,33 +317,12 @@
       "path": "coverlet.collector/6.0.2",
       "hashPath": "coverlet.collector.6.0.2.nupkg.sha512"
     },
-    "FluentValidation/11.11.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-cyIVdQBwSipxWG8MA3Rqox7iNbUNUTK5bfJi9tIdm4CAfH71Oo5ABLP4/QyrUwuakqpUEPGtE43BDddvEehuYw==",
-      "path": "fluentvalidation/11.11.0",
-      "hashPath": "fluentvalidation.11.11.0.nupkg.sha512"
-    },
-    "FluentValidation.DependencyInjectionExtensions/11.11.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
-      "path": "fluentvalidation.dependencyinjectionextensions/11.11.0",
-      "hashPath": "fluentvalidation.dependencyinjectionextensions.11.11.0.nupkg.sha512"
-    },
     "Microsoft.CodeCoverage/17.12.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-4svMznBd5JM21JIG2xZKGNanAHNXplxf/kQDFfLHXQ3OnpJkayRK/TjacFjA+EYmoyuNXHo/sOETEfcYtAzIrA==",
       "path": "microsoft.codecoverage/17.12.0",
       "hashPath": "microsoft.codecoverage.17.12.0.nupkg.sha512"
-    },
-    "Microsoft.Extensions.DependencyInjection.Abstractions/2.1.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-8/CtASu80UIoyG+r8FstrmZW5GLtXxzoYpjj3jV0FKZCL5CiFgSH3pAmqut/dC68mu7N1bU6v0UtKKL3gCUQGQ==",
-      "path": "microsoft.extensions.dependencyinjection.abstractions/2.1.0",
-      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.2.1.0.nupkg.sha512"
     },
     "Microsoft.NET.Test.Sdk/17.12.0": {
       "type": "package",
@@ -511,41 +379,6 @@
       "sha512": "sha512-COC1aiAJjCoA5GBF+QKL2uLqEBew4JsCkQmoHKbN3TlOZKa2fKLz5CpiRQKDz0RsAOEGsVKqOD5bomsXq/4STQ==",
       "path": "system.reflection.metadata/1.6.0",
       "hashPath": "system.reflection.metadata.1.6.0.nupkg.sha512"
-    },
-    "Transaction.Application.Constants/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Transaction.Application.Handlers/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Transaction.Application.Models/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Transaction.Application.Validators/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Transaction.Domain.Entities/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Transaction.Domain.Interfaces/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Transaction.Domain.Rules/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
     }
   }
 }

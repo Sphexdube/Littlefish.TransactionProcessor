@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
+      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
       "projectName": "Transaction.Domain.Entities",
-      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
+      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
       "packagesPath": "/Users/siphesihledube/.nuget/packages/",
-      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/obj/",
+      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rLwmhNxVQKw=",
+  "dgSpecHash": "zc+nODPTZsA=",
   "success": true,
-  "projectFilePath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj",
+  "projectFilePath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

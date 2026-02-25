@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj": {}
+    "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj": {}
   },
   "projects": {
-    "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj": {
+    "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj",
+        "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj",
         "projectName": "Transaction.Application.Constants",
-        "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj",
+        "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj",
         "packagesPath": "/Users/siphesihledube/.nuget/packages/",
-        "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/obj/",
+        "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Constants/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"

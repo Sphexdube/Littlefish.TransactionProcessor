@@ -16,6 +16,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
+          "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": "1.0.0",
           "Transaction.Domain.Entities": "1.0.0"
         },
         "compile": {
@@ -46,6 +47,16 @@
         },
         "runtime": {
           "bin/placeholder/Transaction.Domain.Interfaces.dll": {}
+        }
+      },
+      "Transaction.Domain.Observability/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/Transaction.Domain.Observability.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Transaction.Domain.Observability.dll": {}
         }
       },
       "Transaction.Domain.Rules/1.0.0": {
@@ -85,6 +96,11 @@
       "path": "../Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj",
       "msbuildProject": "../Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
     },
+    "Transaction.Domain.Observability/1.0.0": {
+      "type": "project",
+      "path": "../Transaction.Domain.Observability/Transaction.Domain.Observability.csproj",
+      "msbuildProject": "../Transaction.Domain.Observability/Transaction.Domain.Observability.csproj"
+    },
     "Transaction.Domain.Rules/1.0.0": {
       "type": "project",
       "path": "../Transaction.Domain.Rules/Transaction.Domain.Rules.csproj",
@@ -93,10 +109,12 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
       "Transaction.Application.Constants >= 1.0.0",
       "Transaction.Application.Models >= 1.0.0",
       "Transaction.Domain.Entities >= 1.0.0",
       "Transaction.Domain.Interfaces >= 1.0.0",
+      "Transaction.Domain.Observability >= 1.0.0",
       "Transaction.Domain.Rules >= 1.0.0"
     ]
   },
@@ -106,11 +124,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj",
+      "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj",
       "projectName": "Transaction.Application.Handlers",
-      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj",
+      "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Handlers/Transaction.Application.Handlers.csproj",
       "packagesPath": "/Users/siphesihledube/.nuget/packages/",
-      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Handlers/obj/",
+      "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Handlers/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"
@@ -125,20 +143,26 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj"
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Constants/Transaction.Application.Constants.csproj"
             },
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Application.Models/Transaction.Application.Models.csproj"
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj"
             },
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj"
             },
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
             },
-            "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj": {
-              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj"
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
+            },
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Observability/Transaction.Domain.Observability.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Observability/Transaction.Domain.Observability.csproj"
+            },
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Rules/Transaction.Domain.Rules.csproj"
             }
           }
         }
@@ -177,5 +201,16 @@
         "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.311/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1104",
+      "level": "Error",
+      "message": "Unable to find project '/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj'. Check that the project reference is valid and that the project file exists.",
+      "libraryId": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
+      "targetGraphs": [
+        "net9.0"
+      ]
+    }
+  ]
 }
