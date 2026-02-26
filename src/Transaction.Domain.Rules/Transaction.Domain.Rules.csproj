@@ -5,4 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Transaction.Domain.Entities\Transaction.Domain.Entities.csproj" />
+    <ProjectReference Include="..\Transaction.Domain.Interfaces\Transaction.Domain.Interfaces.csproj" />
+  </ItemGroup>
 </Project>

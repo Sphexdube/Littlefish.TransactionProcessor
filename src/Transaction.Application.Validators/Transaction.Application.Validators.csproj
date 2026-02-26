@@ -5,4 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <ProjectReference Include="..\Transaction.Application.Models\Transaction.Application.Models.csproj" />
+    <ProjectReference Include="..\Transaction.Application.Constants\Transaction.Application.Constants.csproj" />
+  </ItemGroup>
 </Project>

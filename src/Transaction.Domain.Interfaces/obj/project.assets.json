@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net9.0": {}
+    "net9.0": {
+      "Transaction.Domain.Entities/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/Transaction.Domain.Entities.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Transaction.Domain.Entities.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Transaction.Domain.Entities/1.0.0": {
+      "type": "project",
+      "path": "../Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
+      "msbuildProject": "../Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net9.0": []
+    "net9.0": [
+      "Transaction.Domain.Entities >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "/Users/siphesihledube/.nuget/packages/": {}
@@ -31,7 +50,11 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -44,7 +67,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net9.0": {
@@ -65,7 +88,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.311/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/Users/siphesihledube/.dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
