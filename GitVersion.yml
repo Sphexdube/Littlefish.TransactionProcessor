@@ -1,0 +1,84 @@
+next-version: '1.0.0'
+assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-scheme: MajorMinorPatch
+assembly-informational-format: '{Major}.{Minor}.{Patch}-{BranchName}.{CommitsSinceVersionSource}'
+tag-prefix: '[vV]?'
+version-in-branch-pattern: (?<version>[vV]?\d+(\.\d+)?(\.\d+)?).*
+major-version-bump-message: '\+semver:\s?(breaking|major)'
+minor-version-bump-message: '\+semver:\s?(feature|minor)'
+patch-version-bump-message: '\+semver:\s?(fix|patch)'
+no-bump-message: '\+semver:\s?(none|skip)'
+commit-date-format: yyyy-MM-dd
+update-build-number: true
+semantic-version-format: Strict
+branches:
+  develop:
+    mode: ContinuousDelivery
+    label: alpha
+    increment: Patch
+    regex: ^dev(elop)?(ment)?$
+    source-branches:
+    - main
+  main:
+    label: ''
+    increment: Patch
+    regex: ^master$|^main$
+  release:
+    mode: ManualDeployment
+    label: beta
+    increment: Minor
+    regex: ^releases?[/-](?<BranchName>.+)
+    source-branches:
+    - main
+    - support
+  feature:
+    mode: ManualDeployment
+    label: '{BranchName}'
+    increment: Inherit
+    regex: ^features?[/-](?<BranchName>.+)
+    source-branches:
+    - develop
+    - main
+    - release
+    - support
+    - hotfix
+  pull-request:
+    mode: ContinuousDelivery
+    label: PullRequest
+    increment: Inherit
+    label-number-pattern: '[/-](?<number>\d+)'
+    regex: ^(pull|pull\-requests|pr)[/-]
+    source-branches:
+    - develop
+    - main
+    - release
+    - feature
+    - support
+    - hotfix
+  hotfix:
+    mode: ManualDeployment
+    label: beta
+    increment: Inherit
+    regex: ^hotfix(es)?[/-](?<BranchName>.+)
+    source-branches:
+    - main
+    - support
+  support:
+    label: ''
+    increment: Patch
+    regex: ^support[/-](?<BranchName>.+)
+    source-branches:
+    - main
+  unknown:
+    mode: ManualDeployment
+    label: '{BranchName}'
+    increment: Inherit
+    regex: (?<BranchName>.+)
+    source-branches:
+    - main
+    - develop
+    - release
+    - feature
+    - pull-request
+    - hotfix
+    - support
