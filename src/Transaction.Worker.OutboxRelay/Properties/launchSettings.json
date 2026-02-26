@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Transaction.Worker.OutboxRelay": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

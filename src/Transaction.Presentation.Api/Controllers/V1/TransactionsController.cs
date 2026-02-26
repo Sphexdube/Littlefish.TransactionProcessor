@@ -1,12 +1,11 @@
 using Asp.Versioning;
 using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Transaction.Application.Constants;
 using Transaction.Application.Handlers;
-using Transaction.Application.Handlers.Request.V1;
 using Transaction.Application.Models.Request.V1;
+using Transaction.Domain.Commands;
 using Transaction.Application.Models.Response.V1;
 using Transaction.Domain.Observability;
 using Transaction.Presentation.Api.Controllers.Base;
@@ -16,7 +15,6 @@ namespace Transaction.Presentation.Api.Controllers.V1;
 /// <summary>
 /// Controller for managing transaction ingestion and retrieval.
 /// </summary>
-[Authorize]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/tenants/{tenantId:guid}/[controller]")]
 public sealed class TransactionsController(
@@ -44,7 +42,7 @@ public sealed class TransactionsController(
 
         return await ProcessRequestAccepted(
             validator.ValidateAsync,
-            (req, ct) => ingestHandler.HandleAsync(new IngestBatchCommand(tenantId, req, correlationId), ct),
+            (req, ct) => ingestHandler.HandleAsync(req.BuildCommand(tenantId, correlationId), ct),
             request,
             new Dictionary<string, string> { { RequestHeaderKeys.CorrelationId, correlationId } });
     }
@@ -64,6 +62,6 @@ public sealed class TransactionsController(
 
         return await ProcessRequest(
             getTransactionHandler.HandleAsync,
-            new GetTransactionQuery(tenantId, transactionId));
+            new GetTransactionQuery { TenantId = tenantId, TransactionId = transactionId });
     }
 }

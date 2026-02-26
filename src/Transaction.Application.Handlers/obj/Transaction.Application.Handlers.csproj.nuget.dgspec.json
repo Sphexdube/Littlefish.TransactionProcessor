@@ -93,6 +93,9 @@
               "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {
                 "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj"
               },
+              "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": {
+                "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj"
+              },
               "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
                 "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"
               },
@@ -145,6 +148,70 @@
         "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj",
         "packagesPath": "/Users/siphesihledube/.nuget/packages/",
         "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/NuGet.Config",
+          "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": {
+                "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.311/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
+        "projectName": "Transaction.Domain.Commands",
+        "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
+        "packagesPath": "/Users/siphesihledube/.nuget/packages/",
+        "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/NuGet.Config",

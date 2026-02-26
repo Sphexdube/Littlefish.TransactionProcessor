@@ -14,6 +14,7 @@ public class UnitOfWork : IUnitOfWork
     private IBatchRepository? _batches;
     private ITenantRepository? _tenants;
     private IMerchantDailySummaryRepository? _merchantDailySummaries;
+    private IOutboxMessageRepository? _outboxMessages;
 
     public ITransactionRepository Transactions =>
         _transactions ??= new TransactionRepository(_context);
@@ -26,6 +27,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IMerchantDailySummaryRepository MerchantDailySummaries =>
         _merchantDailySummaries ??= new MerchantDailySummaryRepository(_context);
+
+    public IOutboxMessageRepository OutboxMessages =>
+        _outboxMessages ??= new OutboxMessageRepository(_context);
 
     public UnitOfWork(TransactionDbContext context)
     {

@@ -2,21 +2,44 @@ using Transaction.Domain.Entities.Base;
 
 namespace Transaction.Domain.Entities;
 
-public class MerchantDailySummary : Entity<Guid>
+public sealed class MerchantDailySummary : Entity<Guid>
 {
-    public Guid TenantId { get; set; }
+    public Guid TenantId { get; private set; }
 
-    public string MerchantId { get; set; } = string.Empty;
+    public string MerchantId { get; private set; } = string.Empty;
 
-    public DateOnly Date { get; set; }
+    public DateOnly Date { get; private set; }
 
-    public decimal TotalAmount { get; set; }
+    public decimal TotalAmount { get; private set; }
 
-    public int TransactionCount { get; set; }
+    public int TransactionCount { get; private set; }
 
-    public DateTimeOffset LastCalculatedAt { get; set; }
+    public DateTimeOffset LastCalculatedAt { get; private set; }
 
-    public byte[] Version { get; set; } = [];
+    public byte[] Version { get; private set; } = [];
 
-    public virtual Tenant Tenant { get; set; } = null!;
+    public Tenant Tenant { get; set; } = null!;
+
+    private MerchantDailySummary() { }
+
+    public static MerchantDailySummary Create(Guid tenantId, string merchantId, DateOnly date, decimal initialAmount)
+    {
+        return new MerchantDailySummary
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            MerchantId = merchantId,
+            Date = date,
+            TotalAmount = initialAmount,
+            TransactionCount = 1,
+            LastCalculatedAt = DateTimeOffset.UtcNow
+        };
+    }
+
+    public void AddAmount(decimal amount)
+    {
+        TotalAmount += amount;
+        TransactionCount++;
+        LastCalculatedAt = DateTimeOffset.UtcNow;
+    }
 }

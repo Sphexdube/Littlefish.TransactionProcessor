@@ -15,11 +15,24 @@
       "Transaction.Application.Models/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Transaction.Domain.Commands": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/Transaction.Application.Models.dll": {}
         },
         "runtime": {
           "bin/placeholder/Transaction.Application.Models.dll": {}
+        }
+      },
+      "Transaction.Domain.Commands/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/Transaction.Domain.Commands.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Transaction.Domain.Commands.dll": {}
         }
       },
       "Transaction.Domain.Entities/1.0.0": {
@@ -58,6 +71,11 @@
       "path": "../Transaction.Application.Models/Transaction.Application.Models.csproj",
       "msbuildProject": "../Transaction.Application.Models/Transaction.Application.Models.csproj"
     },
+    "Transaction.Domain.Commands/1.0.0": {
+      "type": "project",
+      "path": "../Transaction.Domain.Commands/Transaction.Domain.Commands.csproj",
+      "msbuildProject": "../Transaction.Domain.Commands/Transaction.Domain.Commands.csproj"
+    },
     "Transaction.Domain.Entities/1.0.0": {
       "type": "project",
       "path": "../Transaction.Domain.Entities/Transaction.Domain.Entities.csproj",
@@ -73,6 +91,7 @@
     "net9.0": [
       "Transaction.Application.Constants >= 1.0.0",
       "Transaction.Application.Models >= 1.0.0",
+      "Transaction.Domain.Commands >= 1.0.0",
       "Transaction.Domain.Entities >= 1.0.0",
       "Transaction.Domain.Interfaces >= 1.0.0"
     ]
@@ -108,6 +127,9 @@
             },
             "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj": {
               "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Models/Transaction.Application.Models.csproj"
+            },
+            "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj": {
+              "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Commands/Transaction.Domain.Commands.csproj"
             },
             "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj": {
               "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Entities/Transaction.Domain.Entities.csproj"

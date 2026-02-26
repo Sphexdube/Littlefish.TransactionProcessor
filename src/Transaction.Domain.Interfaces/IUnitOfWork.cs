@@ -10,6 +10,8 @@ public interface IUnitOfWork : IDisposable
 
     IMerchantDailySummaryRepository MerchantDailySummaries { get; }
 
+    IOutboxMessageRepository OutboxMessages { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);

@@ -5,4 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.4" />
+    <PackageReference Include="Aspire.Azure.Messaging.ServiceBus" Version="9.1.0" />
+  </ItemGroup>
 </Project>

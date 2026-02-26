@@ -1,10 +1,9 @@
 using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Transaction.Application.Handlers;
-using Transaction.Application.Handlers.Request.V1;
 using Transaction.Application.Models.Response.V1;
+using Transaction.Domain.Commands;
 using Transaction.Domain.Observability;
 using Transaction.Presentation.Api.Controllers.Base;
 
@@ -13,7 +12,6 @@ namespace Transaction.Presentation.Api.Controllers.V1;
 /// <summary>
 /// Controller for merchant-level queries.
 /// </summary>
-[Authorize]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/tenants/{tenantId:guid}/[controller]")]
 public sealed class MerchantsController(
@@ -37,6 +35,6 @@ public sealed class MerchantsController(
 
         return await ProcessRequest(
             getDailySummaryHandler.HandleAsync,
-            new GetDailySummaryQuery(tenantId, merchantId, date));
+            new GetDailySummaryQuery { TenantId = tenantId, MerchantId = merchantId, Date = date });
     }
 }

@@ -1,0 +1,23 @@
+{
+  "UserConfig": {
+    "Namespaces": [
+      {
+        "Name": "emulator",
+        "Queues": [
+          {
+            "Name": "transactions-ingest",
+            "Properties": {
+              "DeadLetteringOnMessageExpiration": true,
+              "DefaultMessageTimeToLive": "PT1H",
+              "LockDuration": "PT1M",
+              "MaxDeliveryCount": 5
+            }
+          }
+        ]
+      }
+    ],
+    "Logging": {
+      "Type": "File"
+    }
+  }
+}

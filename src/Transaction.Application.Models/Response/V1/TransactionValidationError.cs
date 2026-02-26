@@ -1,3 +1,8 @@
 namespace Transaction.Application.Models.Response.V1;
 
-public record TransactionValidationError(string TransactionId, string ErrorMessage);
+public sealed record TransactionValidationError
+{
+    public required string TransactionId { get; init; }
+
+    public required string ErrorMessage { get; init; }
+}

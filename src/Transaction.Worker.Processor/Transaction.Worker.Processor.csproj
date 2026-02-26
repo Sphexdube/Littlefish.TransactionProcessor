@@ -9,7 +9,11 @@
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
+    <PackageReference Include="Aspire.Azure.Messaging.ServiceBus" Version="9.1.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Littlefish.TransactionProcessor.ServiceDefaults\Littlefish.TransactionProcessor.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Transaction.Application.Models\Transaction.Application.Models.csproj" />
     <ProjectReference Include="..\Transaction.Domain.Entities\Transaction.Domain.Entities.csproj" />
     <ProjectReference Include="..\Transaction.Domain.Interfaces\Transaction.Domain.Interfaces.csproj" />
     <ProjectReference Include="..\Transaction.Domain.Rules\Transaction.Domain.Rules.csproj" />

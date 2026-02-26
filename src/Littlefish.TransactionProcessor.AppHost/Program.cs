@@ -20,11 +20,11 @@ var transactionDb = sqlServer.AddDatabase("TransactionDb", databaseName: "dbTran
 
 // Grate migration container — runs once after SQL Server is ready, before the .NET services start.
 // host.docker.internal lets the Grate container reach the host-mapped SQL Server port.
-var dbScriptsPath = Path.GetFullPath(
+string dbScriptsPath = Path.GetFullPath(
     Path.Combine(builder.AppHostDirectory, "..", "dbTransactionProcessor"));
 
 // Read the password from AppHost configuration so it is not hardcoded in source.
-var dbPassword = builder.Configuration["Parameters:sql-password"]
+string dbPassword = builder.Configuration["Parameters:sql-password"]
     ?? throw new InvalidOperationException(
         "Parameters:sql-password is not configured. " +
         "Add it to appsettings.Development.json or set the Parameters__sql-password environment variable.");
@@ -53,12 +53,30 @@ var grate = builder.AddContainer("grate-migration", "erikbra/grate")
         "echo \"Migrations failed after $max_retries attempts.\"; exit 1")
     .WaitFor(sqlServer);
 
+// Azure Service Bus emulator — runs locally via Docker, no Azure subscription needed.
+// Queue "transactions-ingest" is defined in ServiceBus.Emulator.Config.json.
+var serviceBus = builder
+    .AddAzureServiceBus("messaging")
+    .RunAsEmulator(emulator =>
+    {
+        emulator.WithConfigurationFile(
+            Path.Combine(builder.AppHostDirectory, "ServiceBus.Emulator.Config.json"));
+    });
+
 builder.AddProject<Projects.Transaction_Presentation_Api>("transaction-api")
     .WithReference(transactionDb)
     .WaitFor(grate);
 
+builder.AddProject<Projects.Transaction_Worker_OutboxRelay>("outbox-relay")
+    .WithReference(transactionDb)
+    .WithReference(serviceBus)
+    .WaitFor(grate)
+    .WaitFor(serviceBus);
+
 builder.AddProject<Projects.Transaction_Worker_Processor>("transaction-worker")
     .WithReference(transactionDb)
-    .WaitFor(grate);
+    .WithReference(serviceBus)
+    .WaitFor(grate)
+    .WaitFor(serviceBus);
 
 builder.Build().Run();

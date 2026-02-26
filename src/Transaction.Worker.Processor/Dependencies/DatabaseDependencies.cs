@@ -1,17 +1,20 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Transaction.Domain.Interfaces;
+using Transaction.Infrastructure.Persistence;
 using Transaction.Infrastructure.Persistence.Context;
 using Transaction.Infrastructure.Persistence.Repositories;
 
-namespace Transaction.Infrastructure.Persistence.Extensions;
+namespace Transaction.Worker.Processor.Dependencies;
 
-public static class ServiceCollectionExtensions
+internal static class DatabaseDependencies
 {
-    public static IServiceCollection AddPersistence(this IServiceCollection services, string connectionString)
+    internal static IServiceCollection AddDatabaseDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<TransactionDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseSqlServer(configuration.GetConnectionString("TransactionDb")));
+
+        services.AddHealthChecks()
+            .AddDbContextCheck<TransactionDbContext>("database");
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();

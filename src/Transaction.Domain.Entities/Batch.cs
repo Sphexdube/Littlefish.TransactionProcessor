@@ -3,25 +3,47 @@ using Transaction.Domain.Entities.Enums;
 
 namespace Transaction.Domain.Entities;
 
-public class Batch : Entity<Guid>
+public sealed class Batch : Entity<Guid>
 {
-    public Guid TenantId { get; set; }
+    public Guid TenantId { get; private set; }
 
-    public BatchStatus Status { get; set; } = BatchStatus.Received;
+    public BatchStatus Status { get; private set; } = BatchStatus.Received;
 
-    public int TotalCount { get; set; }
+    public int TotalCount { get; private set; }
 
-    public int AcceptedCount { get; set; }
+    public int AcceptedCount { get; private set; }
 
-    public int RejectedCount { get; set; }
+    public int RejectedCount { get; private set; }
 
-    public int QueuedCount { get; set; }
+    public int QueuedCount { get; private set; }
 
-    public string CorrelationId { get; set; } = string.Empty;
+    public string CorrelationId { get; private set; } = string.Empty;
 
-    public DateTimeOffset? CompletedAt { get; set; }
+    public DateTimeOffset? CompletedAt { get; private set; }
 
-    public virtual Tenant Tenant { get; set; } = null!;
+    public Tenant Tenant { get; set; } = null!;
 
-    public virtual ICollection<TransactionRecord> Transactions { get; set; } = new List<TransactionRecord>();
+    public ICollection<TransactionRecord> Transactions { get; set; } = new List<TransactionRecord>();
+
+    private Batch() { }
+
+    public static Batch Create(Guid tenantId, int totalCount, string correlationId)
+    {
+        return new Batch
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            Status = BatchStatus.Received,
+            TotalCount = totalCount,
+            CorrelationId = correlationId
+        };
+    }
+
+    public void UpdateCounts(int accepted, int rejected, int queued)
+    {
+        AcceptedCount = accepted;
+        RejectedCount = rejected;
+        QueuedCount = queued;
+        Status = BatchStatus.Processing;
+    }
 }

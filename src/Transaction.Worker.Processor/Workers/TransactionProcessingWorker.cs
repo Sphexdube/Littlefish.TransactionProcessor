@@ -1,4 +1,7 @@
+using System.Text.Json;
+using Azure.Messaging.ServiceBus;
 using Microsoft.EntityFrameworkCore;
+using Transaction.Application.Models.Messaging;
 using Transaction.Domain.Entities;
 using Transaction.Domain.Entities.Enums;
 using Transaction.Domain.Interfaces;
@@ -6,192 +9,211 @@ using Transaction.Domain.Rules;
 
 namespace Transaction.Worker.Processor.Workers;
 
-public sealed class TransactionProcessingWorker(
-    IServiceScopeFactory scopeFactory,
-    ILogger<TransactionProcessingWorker> logger) : BackgroundService
+public sealed class TransactionProcessingWorker : BackgroundService
 {
-    private const int BatchSize = 50;
-    private const int PollingIntervalSeconds = 5;
     private const int MaxRetries = 3;
+
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ServiceBusClient _serviceBusClient;
+    private readonly ILogger<TransactionProcessingWorker> _logger;
+    private readonly string _queueName;
+
+    private ServiceBusProcessor? _processor;
+
+    public TransactionProcessingWorker(
+        IServiceScopeFactory scopeFactory,
+        ServiceBusClient serviceBusClient,
+        ILogger<TransactionProcessingWorker> logger,
+        IConfiguration configuration)
+    {
+        _scopeFactory = scopeFactory;
+        _serviceBusClient = serviceBusClient;
+        _logger = logger;
+        _queueName = configuration.GetValue<string>("ServiceBus:QueueName") ?? "transactions-ingest";
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("Transaction processing worker started");
+        _logger.LogInformation("TransactionProcessingWorker starting. Listening on queue '{Queue}'.", _queueName);
 
-        while (!stoppingToken.IsCancellationRequested)
+        ServiceBusProcessorOptions options = new ServiceBusProcessorOptions
         {
-            try
-            {
-                await ProcessPendingTransactionsAsync(stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Unhandled error in processing loop");
-            }
+            MaxConcurrentCalls = 4,
+            AutoCompleteMessages = false
+        };
 
-            await Task.Delay(TimeSpan.FromSeconds(PollingIntervalSeconds), stoppingToken);
+        _processor = _serviceBusClient.CreateProcessor(_queueName, options);
+        _processor.ProcessMessageAsync += OnMessageReceivedAsync;
+        _processor.ProcessErrorAsync += OnErrorAsync;
+
+        await _processor.StartProcessingAsync(stoppingToken);
+
+        try
+        {
+            await Task.Delay(Timeout.Infinite, stoppingToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // shutting down — expected
+        }
+        finally
+        {
+            await _processor.StopProcessingAsync();
+            await _processor.DisposeAsync();
         }
 
-        logger.LogInformation("Transaction processing worker stopped");
+        _logger.LogInformation("TransactionProcessingWorker stopped.");
     }
 
-    private async Task ProcessPendingTransactionsAsync(CancellationToken cancellationToken)
+    private async Task OnMessageReceivedAsync(ProcessMessageEventArgs args)
     {
-        List<Guid> pendingIds;
+        TransactionMessagePayload? payload = JsonSerializer.Deserialize<TransactionMessagePayload>(
+            args.Message.Body.ToString());
 
-        using (var scope = scopeFactory.CreateScope())
+        if (payload == null)
         {
-            var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            var pending = await uow.Transactions.GetPendingTransactionsAsync(BatchSize, cancellationToken);
-            pendingIds = pending.Select(t => t.Id).ToList();
-        }
-
-        if (pendingIds.Count == 0)
+            _logger.LogError("Failed to deserialise message {MessageId}. Dead-lettering.", args.Message.MessageId);
+            await args.DeadLetterMessageAsync(args.Message, "DeserializationFailed", "Payload could not be deserialised.");
             return;
-
-        logger.LogInformation("Picked up {Count} pending transactions for processing", pendingIds.Count);
-
-        foreach (var id in pendingIds)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                break;
-
-            await ProcessTransactionWithRetriesAsync(id, cancellationToken);
         }
-    }
 
-    private async Task ProcessTransactionWithRetriesAsync(Guid transactionRecordId, CancellationToken cancellationToken)
-    {
-        for (var attempt = 1; attempt <= MaxRetries; attempt++)
+        IUnitOfWork? unitOfWork = null;
+
+        for (int attempt = 1; attempt <= MaxRetries; attempt++)
         {
-            using var scope = scopeFactory.CreateScope();
-            var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            var ruleEngine = scope.ServiceProvider.GetRequiredService<IRuleEngine>();
+            await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+            unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            IRuleEngine ruleEngine = scope.ServiceProvider.GetRequiredService<IRuleEngine>();
 
             try
             {
-                var transaction = await uow.Transactions.GetByIdWithDetailsAsync(transactionRecordId, cancellationToken);
+                TransactionRecord? transaction = await unitOfWork.Transactions.GetByTransactionIdAsync(
+                    payload.TenantId, payload.TransactionId, args.CancellationToken);
 
-                if (transaction is null || transaction.Status != TransactionStatus.Received)
+                if (transaction == null)
+                {
+                    _logger.LogWarning(
+                        "TransactionRecord not found for TenantId={TenantId}, TransactionId={TransactionId}. Dead-lettering.",
+                        payload.TenantId, payload.TransactionId);
+                    await args.DeadLetterMessageAsync(args.Message, "NotFound", "TransactionRecord not found in database.");
                     return;
+                }
 
-                using var logScope = logger.BeginScope(new Dictionary<string, object>
+                if (transaction.Status != TransactionStatus.Received)
                 {
-                    ["CorrelationId"] = transaction.Batch?.CorrelationId ?? string.Empty,
-                    ["TransactionId"] = transaction.TransactionId,
-                    ["TenantId"] = transaction.TenantId
-                });
+                    _logger.LogInformation(
+                        "Transaction {TransactionId} already processed (Status={Status}). Completing message (idempotent).",
+                        payload.TransactionId, transaction.Status);
+                    await args.CompleteMessageAsync(args.Message);
+                    return;
+                }
 
-                await uow.BeginTransactionAsync(cancellationToken);
+                Tenant? tenant = await unitOfWork.Tenants.GetByIdAsync(payload.TenantId, args.CancellationToken);
 
-                transaction.Status = TransactionStatus.Processing;
-                await uow.SaveChangesAsync(cancellationToken);
-
-                var date = DateOnly.FromDateTime(transaction.OccurredAt.UtcDateTime);
-                var summary = await uow.MerchantDailySummaries.GetByMerchantAndDateAsync(
-                    transaction.TenantId, transaction.MerchantId, date, cancellationToken);
-
-                var ruleContext = new RuleContext(transaction, transaction.Tenant, summary?.TotalAmount ?? 0m);
-                var results = await ruleEngine.EvaluateAllAsync(ruleContext, cancellationToken);
-
-                var failure = results.FirstOrDefault(r => !r.IsValid);
-                var review = results.FirstOrDefault(r => r.RequiresReview);
-
-                transaction.ProcessedAt = DateTimeOffset.UtcNow;
-
-                if (failure is not null)
+                if (tenant == null)
                 {
-                    transaction.Status = TransactionStatus.Rejected;
-                    transaction.RejectionReason = failure.ErrorMessage;
+                    _logger.LogError("Tenant {TenantId} not found. Dead-lettering.", payload.TenantId);
+                    await args.DeadLetterMessageAsync(args.Message, "TenantNotFound", $"Tenant {payload.TenantId} not found.");
+                    return;
+                }
+
+                await unitOfWork.BeginTransactionAsync(args.CancellationToken);
+
+                transaction.BeginProcessing();
+                await unitOfWork.SaveChangesAsync(args.CancellationToken);
+
+                DateOnly date = DateOnly.FromDateTime(transaction.OccurredAt.UtcDateTime);
+
+                MerchantDailySummary? summary = await unitOfWork.MerchantDailySummaries.GetByMerchantAndDateAsync(
+                    transaction.TenantId, transaction.MerchantId, date, args.CancellationToken);
+
+                RuleContext ruleContext = new RuleContext(transaction, tenant, summary?.TotalAmount ?? 0m);
+                IEnumerable<RuleResult> results = await ruleEngine.EvaluateAllAsync(ruleContext, args.CancellationToken);
+
+                RuleResult? failure = results.FirstOrDefault(r => !r.IsValid);
+                RuleResult? review = results.FirstOrDefault(r => r.RequiresReview);
+
+                if (failure != null)
+                {
+                    transaction.Reject(failure.ErrorMessage ?? string.Empty);
                 }
                 else
                 {
-                    transaction.Status = review is not null ? TransactionStatus.Review : TransactionStatus.Processed;
-                    transaction.RejectionReason = review?.ErrorMessage;
+                    if (review != null)
+                        transaction.MarkForReview(review.ErrorMessage);
+                    else
+                        transaction.Complete();
 
                     if (transaction.Type == TransactionType.Purchase)
                     {
-                        if (summary is null)
+                        if (summary == null)
                         {
-                            await uow.MerchantDailySummaries.AddAsync(new MerchantDailySummary
-                            {
-                                Id = Guid.NewGuid(),
-                                TenantId = transaction.TenantId,
-                                MerchantId = transaction.MerchantId,
-                                Date = date,
-                                TotalAmount = transaction.Amount,
-                                TransactionCount = 1,
-                                LastCalculatedAt = DateTimeOffset.UtcNow
-                            }, cancellationToken);
+                            MerchantDailySummary newSummary = MerchantDailySummary.Create(
+                                transaction.TenantId,
+                                transaction.MerchantId,
+                                date,
+                                transaction.Amount);
+                            await unitOfWork.MerchantDailySummaries.AddAsync(newSummary, args.CancellationToken);
                         }
                         else
                         {
-                            summary.TotalAmount += transaction.Amount;
-                            summary.TransactionCount++;
-                            summary.LastCalculatedAt = DateTimeOffset.UtcNow;
+                            summary.AddAmount(transaction.Amount);
                         }
                     }
                 }
 
-                await uow.SaveChangesAsync(cancellationToken); // RowVersion check on MerchantDailySummary
-                await uow.CommitTransactionAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(args.CancellationToken);
+                await unitOfWork.CommitTransactionAsync(args.CancellationToken);
 
-                logger.LogInformation("Transaction {TransactionId} → {Status}",
+                _logger.LogInformation("Transaction {TransactionId} → {Status}",
                     transaction.TransactionId, transaction.Status);
+
+                await args.CompleteMessageAsync(args.Message);
                 return;
             }
             catch (DbUpdateConcurrencyException) when (attempt < MaxRetries)
             {
-                await uow.RollbackTransactionAsync(cancellationToken);
-                logger.LogWarning(
-                    "Concurrency conflict on transaction record {Id}, retrying (attempt {Attempt}/{Max})",
-                    transactionRecordId, attempt, MaxRetries);
+                await unitOfWork.RollbackTransactionAsync(args.CancellationToken);
+                _logger.LogWarning(
+                    "Concurrency conflict processing {TransactionId}, retrying (attempt {Attempt}/{Max}).",
+                    payload.TransactionId, attempt, MaxRetries);
             }
             catch (DbUpdateConcurrencyException)
             {
-                await uow.RollbackTransactionAsync(cancellationToken);
-                logger.LogError(
-                    "Concurrency conflict on transaction record {Id} exhausted retries — will retry on next poll cycle",
-                    transactionRecordId);
-                await ResetToReceivedAsync(transactionRecordId, cancellationToken);
+                await unitOfWork.RollbackTransactionAsync(args.CancellationToken);
+                _logger.LogError(
+                    "Concurrency conflict on {TransactionId} exhausted retries. Abandoning for redelivery.",
+                    payload.TransactionId);
+                await args.AbandonMessageAsync(args.Message);
+                return;
             }
-            catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException)
             {
-                try { await uow.RollbackTransactionAsync(cancellationToken); } catch { /* ignore */ }
-                logger.LogError(ex, "Error processing transaction record {Id}", transactionRecordId);
-                await RejectWithErrorAsync(transactionRecordId, ex.Message, cancellationToken);
+                if (unitOfWork != null)
+                {
+                    try { await unitOfWork.RollbackTransactionAsync(args.CancellationToken); } catch { /* ignore */ }
+                }
+                await args.AbandonMessageAsync(args.Message);
+                return;
+            }
+            catch (Exception ex)
+            {
+                if (unitOfWork != null)
+                {
+                    try { await unitOfWork.RollbackTransactionAsync(args.CancellationToken); } catch { /* ignore */ }
+                }
+                _logger.LogError(ex, "Unexpected error processing transaction {TransactionId}.", payload.TransactionId);
+                await args.DeadLetterMessageAsync(args.Message, "UnexpectedError", ex.Message);
                 return;
             }
         }
     }
 
-    private async Task ResetToReceivedAsync(Guid transactionRecordId, CancellationToken cancellationToken)
+    private Task OnErrorAsync(ProcessErrorEventArgs args)
     {
-        using var scope = scopeFactory.CreateScope();
-        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        var tx = await uow.Transactions.GetByIdWithDetailsAsync(transactionRecordId, cancellationToken);
-        if (tx is { Status: TransactionStatus.Processing })
-        {
-            tx.Status = TransactionStatus.Received;
-            try { await uow.SaveChangesAsync(cancellationToken); } catch { /* ignore */ }
-        }
-    }
-
-    private async Task RejectWithErrorAsync(Guid transactionRecordId, string errorMessage, CancellationToken cancellationToken)
-    {
-        using var scope = scopeFactory.CreateScope();
-        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        var tx = await uow.Transactions.GetByIdWithDetailsAsync(transactionRecordId, cancellationToken);
-        if (tx is not null)
-        {
-            tx.Status = TransactionStatus.Rejected;
-            tx.RejectionReason = $"Processing error: {errorMessage}";
-            tx.ProcessedAt = DateTimeOffset.UtcNow;
-            try { await uow.SaveChangesAsync(cancellationToken); } catch { /* ignore */ }
-        }
+        _logger.LogError(args.Exception,
+            "Service Bus error. Source={ErrorSource}, Entity={EntityPath}.",
+            args.ErrorSource, args.EntityPath);
+        return Task.CompletedTask;
     }
 }

@@ -3,35 +3,91 @@ using Transaction.Domain.Entities.Enums;
 
 namespace Transaction.Domain.Entities;
 
-public class TransactionRecord : Entity<Guid>
+public sealed class TransactionRecord : Entity<Guid>
 {
-    public Guid TenantId { get; set; }
+    public Guid TenantId { get; private set; }
 
-    public string TransactionId { get; set; } = string.Empty;
+    public string TransactionId { get; private set; } = string.Empty;
 
-    public string MerchantId { get; set; } = string.Empty;
+    public string MerchantId { get; private set; } = string.Empty;
 
-    public decimal Amount { get; set; }
+    public decimal Amount { get; private set; }
 
-    public string Currency { get; set; } = "USD";
+    public string Currency { get; private set; } = "USD";
 
-    public TransactionType Type { get; set; }
+    public TransactionType Type { get; private set; }
 
-    public string? OriginalTransactionId { get; set; }
+    public string? OriginalTransactionId { get; private set; }
 
-    public TransactionStatus Status { get; set; } = TransactionStatus.Received;
+    public TransactionStatus Status { get; private set; } = TransactionStatus.Received;
 
-    public DateTimeOffset OccurredAt { get; set; }
+    public DateTimeOffset OccurredAt { get; private set; }
 
-    public string? Metadata { get; set; }
+    public string? Metadata { get; private set; }
 
-    public Guid BatchId { get; set; }
+    public Guid BatchId { get; private set; }
 
-    public string? RejectionReason { get; set; }
+    public string? RejectionReason { get; private set; }
 
-    public DateTimeOffset? ProcessedAt { get; set; }
+    public DateTimeOffset? ProcessedAt { get; private set; }
 
-    public virtual Tenant Tenant { get; set; } = null!;
+    public Tenant Tenant { get; set; } = null!;
 
-    public virtual Batch Batch { get; set; } = null!;
+    public Batch Batch { get; set; } = null!;
+
+    private TransactionRecord() { }
+
+    public static TransactionRecord Create(
+        Guid tenantId,
+        Guid batchId,
+        string transactionId,
+        string merchantId,
+        decimal amount,
+        string currency,
+        TransactionType type,
+        string? originalTransactionId,
+        DateTimeOffset occurredAt,
+        string? metadata)
+    {
+        return new TransactionRecord
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            BatchId = batchId,
+            TransactionId = transactionId,
+            MerchantId = merchantId,
+            Amount = amount,
+            Currency = currency,
+            Type = type,
+            OriginalTransactionId = originalTransactionId,
+            OccurredAt = occurredAt,
+            Status = TransactionStatus.Received,
+            Metadata = metadata
+        };
+    }
+
+    public void BeginProcessing()
+    {
+        Status = TransactionStatus.Processing;
+    }
+
+    public void Complete()
+    {
+        Status = TransactionStatus.Processed;
+        ProcessedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void Reject(string reason)
+    {
+        Status = TransactionStatus.Rejected;
+        RejectionReason = reason;
+        ProcessedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void MarkForReview(string? reason)
+    {
+        Status = TransactionStatus.Review;
+        RejectionReason = reason;
+        ProcessedAt = DateTimeOffset.UtcNow;
+    }
 }
