@@ -1,3 +1,11 @@
+if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DOTNET_DASHBOARD_OTLP_ENDPOINT_URL")) &&
+    string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DOTNET_DASHBOARD_OTLP_HTTP_ENDPOINT_URL")))
+{
+    // Local default so AppHost can start without requiring external OTLP env configuration.
+    Environment.SetEnvironmentVariable("DOTNET_DASHBOARD_OTLP_HTTP_ENDPOINT_URL", "http://localhost:4318");
+    Environment.SetEnvironmentVariable("ASPIRE_ALLOW_UNSECURED_TRANSPORT", "true");
+}
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // SQL Server SA password — set in appsettings.Development.json (Parameters:sql-password).
