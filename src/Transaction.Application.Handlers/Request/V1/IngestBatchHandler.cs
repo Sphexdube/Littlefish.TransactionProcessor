@@ -1,8 +1,10 @@
 using System.Text.Json;
+using Transaction.Application.Constants;
 using Transaction.Application.Models.Request.V1;
 using Transaction.Application.Models.Response.V1;
 using Transaction.Domain.Entities;
 using Transaction.Domain.Entities.Enums;
+using Transaction.Domain.Entities.Exceptions;
 using Transaction.Domain.Interfaces;
 
 namespace Transaction.Application.Handlers.Request.V1;
@@ -18,6 +20,9 @@ public class IngestBatchHandler : IRequestHandler<IngestBatchCommand, IngestBatc
 
     public async Task<IngestBatchResponse> HandleAsync(IngestBatchCommand command, CancellationToken cancellationToken = default)
     {
+        if (await _unitOfWork.Tenants.GetByIdAsync(command.TenantId, cancellationToken) == null)
+            throw new NotFoundException(ErrorMessages.TenantNotFound);
+
         var errors = new List<TransactionValidationError>();
         int acceptedCount = 0;
         int rejectedCount = 0;

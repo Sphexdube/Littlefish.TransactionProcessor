@@ -8,7 +8,6 @@ using Transaction.Application.Handlers;
 using Transaction.Application.Handlers.Request.V1;
 using Transaction.Application.Models.Request.V1;
 using Transaction.Application.Models.Response.V1;
-using Transaction.Domain.Interfaces;
 using Transaction.Domain.Observability;
 using Transaction.Presentation.Api.Controllers.Base;
 
@@ -24,8 +23,7 @@ public sealed class TransactionsController(
     ILogger<TransactionsController> logger,
     IRequestHandler<IngestBatchCommand, IngestBatchResponse> ingestHandler,
     IRequestHandler<GetTransactionQuery, TransactionResponse> getTransactionHandler,
-    IValidator<IngestTransactionBatchRequest> validator,
-    IUnitOfWork unitOfWork) : BaseController(logger)
+    IValidator<IngestTransactionBatchRequest> validator) : BaseController(logger)
 {
     /// <summary>
     /// Ingests a batch of transactions for a tenant.
@@ -44,9 +42,6 @@ public sealed class TransactionsController(
     {
         ObservabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
 
-        if (await unitOfWork.Tenants.GetByIdAsync(tenantId, HttpContext.RequestAborted) == null)
-            return NotFound(new { Message = ErrorMessages.TenantNotFound });
-
         return await ProcessRequestAccepted(
             validator.ValidateAsync,
             (req, ct) => ingestHandler.HandleAsync(new IngestBatchCommand(tenantId, req, correlationId), ct),
@@ -61,7 +56,6 @@ public sealed class TransactionsController(
     /// <param name="transactionId">The transaction identifier.</param>
     [HttpGet("{transactionId}")]
     [ProducesResponseType(typeof(TransactionResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> GetTransactionAsync(
         Guid tenantId,
         string transactionId)

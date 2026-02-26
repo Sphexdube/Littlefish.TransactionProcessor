@@ -81,6 +81,7 @@ public class TransactionDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.MerchantId).HasMaxLength(100).IsRequired();
             entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            entity.Property(e => e.Version).IsRowVersion();
 
             entity.HasIndex(e => new { e.TenantId, e.MerchantId, e.Date }).IsUnique();
 

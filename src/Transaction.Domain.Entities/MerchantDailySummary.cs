@@ -16,5 +16,7 @@ public class MerchantDailySummary : Entity<Guid>
 
     public DateTimeOffset LastCalculatedAt { get; set; }
 
+    public byte[] Version { get; set; } = [];
+
     public virtual Tenant Tenant { get; set; } = null!;
 }

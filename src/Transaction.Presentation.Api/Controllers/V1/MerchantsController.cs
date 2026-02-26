@@ -28,7 +28,6 @@ public sealed class MerchantsController(
     /// <param name="date">The date for the summary.</param>
     [HttpGet("{merchantId}/daily-summary")]
     [ProducesResponseType(typeof(DailySummaryResponse), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> GetDailySummaryAsync(
         Guid tenantId,
         string merchantId,

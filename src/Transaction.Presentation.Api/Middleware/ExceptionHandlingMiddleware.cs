@@ -1,20 +1,45 @@
 using Transaction.Domain.Entities.Exceptions;
+using Transaction.Domain.Observability;
+using Transaction.Domain.Observability.Contracts;
 
 namespace Transaction.Presentation.Api.Middleware;
 
-public sealed class ExceptionHandlingMiddleware(RequestDelegate next)
+public class ExceptionHandlingMiddleware(IObservabilityManager observabilityManager, RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context)
     {
+        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+
         try
         {
             await next(context);
         }
-        catch (NotFoundException ex)
+        catch (Exception ex)
         {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { Message = ex.Message });
+            await HandleExceptionMessages(context, ex);
         }
+    }
+
+    private async Task HandleExceptionMessages(HttpContext context, Exception exception)
+    {
+        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+
+        Exception baseException = exception.GetBaseException();
+        switch (baseException)
+        {
+            case NotFoundException:
+                await HandleNotFoundResponse(context, baseException);
+                break;
+            default:
+                throw exception;
+        }
+    }
+
+    private async Task HandleNotFoundResponse(HttpContext context, Exception exception)
+    {
+        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        await context.Response.WriteAsync(exception.Message);
     }
 }

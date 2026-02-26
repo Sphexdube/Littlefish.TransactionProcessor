@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Transaction.Application.Handlers;
 using Transaction.Application.Handlers.Request.V1;
 using Transaction.Application.Models.Response.V1;
+using Transaction.Domain.Observability.Contracts;
 using Transaction.Presentation.Api.Middleware;
+using Transaction.Presentation.Api.Observability;
 using Transaction.Application.Validators.V1;
 using Transaction.Domain.Interfaces;
 using Transaction.Domain.Rules;
@@ -37,6 +39,12 @@ builder.Services.AddApiVersioning(options =>
 
 builder.Services.AddDbContext<TransactionDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TransactionDb")));
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<TransactionDbContext>("database");
+
+builder.Services.AddSingleton<IObservabilityManager>(sp =>
+    new ObservabilityManager(sp.GetRequiredService<ILogger<ObservabilityManager>>()));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();

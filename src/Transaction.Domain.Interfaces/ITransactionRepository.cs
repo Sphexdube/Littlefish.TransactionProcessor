@@ -13,4 +13,6 @@ public interface ITransactionRepository : IRepository<TransactionRecord, Guid>
     Task<decimal> GetDailyMerchantTotalAsync(Guid tenantId, string merchantId, DateOnly date, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<TransactionRecord>> GetPendingTransactionsAsync(int batchSize, CancellationToken cancellationToken = default);
+
+    Task<TransactionRecord?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
 }

@@ -72,4 +72,14 @@ public class TransactionRepository : Repository<TransactionRecord, Guid>, ITrans
             .Take(batchSize)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<TransactionRecord?> GetByIdWithDetailsAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(t => t.Tenant)
+            .Include(t => t.Batch)
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+    }
 }

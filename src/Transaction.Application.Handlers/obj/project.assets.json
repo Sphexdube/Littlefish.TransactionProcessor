@@ -90,6 +90,7 @@
       "outputPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Application.Handlers/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
+        "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/NuGet.Config",
         "/Users/siphesihledube/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
@@ -127,7 +128,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0": {
@@ -148,7 +149,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/Users/siphesihledube/.dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.311/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
