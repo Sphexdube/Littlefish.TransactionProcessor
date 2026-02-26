@@ -22,6 +22,10 @@ public sealed class TransactionDbContext : DbContext
 
     public DbSet<BatchStatusValue> BatchStatuses => Set<BatchStatusValue>();
 
+    public DbSet<RuleWorkflow> RuleWorkflows => Set<RuleWorkflow>();
+
+    public DbSet<BusinessRule> BusinessRules => Set<BusinessRule>();
+
     public TransactionDbContext(DbContextOptions<TransactionDbContext> options)
         : base(options)
     {

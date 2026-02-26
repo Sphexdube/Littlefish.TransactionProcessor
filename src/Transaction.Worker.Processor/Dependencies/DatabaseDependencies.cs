@@ -21,6 +21,7 @@ internal static class DatabaseDependencies
         services.AddScoped<IBatchRepository, BatchRepository>();
         services.AddScoped<ITenantRepository, TenantRepository>();
         services.AddScoped<IMerchantDailySummaryRepository, MerchantDailySummaryRepository>();
+        services.AddScoped<IRuleWorkflowRepository, RuleWorkflowRepository>();
 
         return services;
     }

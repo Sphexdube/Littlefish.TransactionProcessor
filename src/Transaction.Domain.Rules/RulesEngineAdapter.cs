@@ -1,6 +1,5 @@
-using System.Reflection;
-using System.Text.Json;
 using RulesEngine.Models;
+using Transaction.Domain.Entities;
 using Transaction.Domain.Entities.Enums;
 using Transaction.Domain.Interfaces;
 
@@ -9,19 +8,29 @@ namespace Transaction.Domain.Rules;
 public sealed class RulesEngineAdapter : IRuleEngine
 {
     private const string WorkflowName = "TransactionRules";
-    private const string ReviewSuccessEvent = "REVIEW";
 
-    private readonly RulesEngine.RulesEngine _rulesEngine;
     private readonly ITransactionRepository _transactionRepository;
+    private readonly IRuleWorkflowRepository _ruleWorkflowRepository;
 
-    public RulesEngineAdapter(ITransactionRepository transactionRepository)
+    public RulesEngineAdapter(
+        ITransactionRepository transactionRepository,
+        IRuleWorkflowRepository ruleWorkflowRepository)
     {
         _transactionRepository = transactionRepository;
-        _rulesEngine = BuildRulesEngine();
+        _ruleWorkflowRepository = ruleWorkflowRepository;
     }
 
     public async Task<IEnumerable<RuleResult>> EvaluateAllAsync(RuleContext context, CancellationToken cancellationToken = default)
     {
+        RuleWorkflow? workflow = await _ruleWorkflowRepository.GetByNameAsync(WorkflowName, cancellationToken);
+
+        if (workflow == null)
+        {
+            throw new InvalidOperationException($"Rule workflow '{WorkflowName}' not found in database.");
+        }
+
+        RulesEngine.RulesEngine rulesEngine = BuildRulesEngine(workflow);
+
         bool originalPurchaseExists = false;
 
         if (context.Transaction.Type == TransactionType.Refund &&
@@ -43,7 +52,7 @@ public sealed class RulesEngineAdapter : IRuleEngine
             ProjectedDailyTotal = context.CurrentDailyMerchantTotal + context.Transaction.Amount
         };
 
-        List<RuleResultTree> ruleResults = await _rulesEngine.ExecuteAllRulesAsync(WorkflowName, input);
+        List<RuleResultTree> ruleResults = await rulesEngine.ExecuteAllRulesAsync(WorkflowName, input);
 
         List<RuleResult> results = new List<RuleResult>();
 
@@ -71,25 +80,27 @@ public sealed class RulesEngineAdapter : IRuleEngine
         return results;
     }
 
-    private static RulesEngine.RulesEngine BuildRulesEngine()
+    private static RulesEngine.RulesEngine BuildRulesEngine(RuleWorkflow workflow)
     {
-        Assembly assembly = Assembly.GetExecutingAssembly();
-        string resourceName = $"{assembly.GetName().Name}.Rules.TransactionRules.json";
+        List<Rule> rules = workflow.Rules
+            .Select(r => new Rule
+            {
+                RuleName = r.RuleName,
+                RuleExpressionType = Enum.Parse<RuleExpressionType>(r.RuleExpressionType),
+                Expression = r.Expression,
+                ErrorMessage = r.ErrorMessage,
+                SuccessEvent = r.SuccessEvent
+            })
+            .ToList();
 
-        using Stream? stream = assembly.GetManifestResourceStream(resourceName);
-
-        if (stream == null)
+        Workflow[] workflows = new Workflow[]
         {
-            throw new InvalidOperationException(
-                $"Embedded resource '{resourceName}' not found. " +
-                "Ensure TransactionRules.json is marked as EmbeddedResource in the csproj.");
-        }
-
-        using StreamReader reader = new StreamReader(stream);
-        string json = reader.ReadToEnd();
-
-        Workflow[] workflows = JsonSerializer.Deserialize<Workflow[]>(json)
-            ?? throw new InvalidOperationException("Failed to deserialise TransactionRules.json.");
+            new Workflow
+            {
+                WorkflowName = workflow.Name,
+                Rules = rules
+            }
+        };
 
         return new RulesEngine.RulesEngine(workflows);
     }
