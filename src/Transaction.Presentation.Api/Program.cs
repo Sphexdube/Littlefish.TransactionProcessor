@@ -2,12 +2,15 @@ using Asp.Versioning;
 using FluentValidation;
 using Littlefish.TransactionProcessor.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Transaction.Application.Handlers;
 using Transaction.Application.Handlers.Request.V1;
 using Transaction.Application.Models.Response.V1;
 using Transaction.Domain.Observability.Contracts;
 using Transaction.Presentation.Api.Middleware;
 using Transaction.Presentation.Api.Observability;
+using Transaction.Presentation.Api.Swagger;
 using Transaction.Application.Validators.V1;
 using Transaction.Domain.Interfaces;
 using Transaction.Domain.Rules;
@@ -28,6 +31,7 @@ builder.Services
     });
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApiVersioning(options =>
@@ -35,7 +39,12 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(1, 0);
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
-}).AddMvc();
+}).AddMvc()
+  .AddApiExplorer(options =>
+  {
+      options.GroupNameFormat = "'v'VVV";
+      options.SubstituteApiVersionInUrl = true;
+  });
 
 builder.Services.AddDbContext<TransactionDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TransactionDb")));
@@ -71,7 +80,15 @@ app.MapDefaultEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var description in app.DescribeApiVersions())
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+        }
+    });
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
