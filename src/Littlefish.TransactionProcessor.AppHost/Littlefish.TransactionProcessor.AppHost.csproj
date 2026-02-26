@@ -16,4 +16,7 @@
     <ProjectReference Include="..\Transaction.Presentation.Api\Transaction.Presentation.Api.csproj" IsAspireProjectResource="true" />
     <ProjectReference Include="..\Transaction.Worker.Processor\Transaction.Worker.Processor.csproj" IsAspireProjectResource="true" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
