@@ -16,11 +16,13 @@ public sealed class IngestBatchHandler : IRequestHandler<IngestBatchCommand, Ing
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IObservabilityManager _observabilityManager;
+    private readonly IMetricRecorder _metricRecorder;
 
-    public IngestBatchHandler(IUnitOfWork unitOfWork, IObservabilityManager observabilityManager)
+    public IngestBatchHandler(IUnitOfWork unitOfWork, IObservabilityManager observabilityManager, IMetricRecorder metricRecorder)
     {
         _unitOfWork = unitOfWork;
         _observabilityManager = observabilityManager;
+        _metricRecorder = metricRecorder;
     }
 
     public async Task<IngestBatchResponse> HandleAsync(IngestBatchCommand command, CancellationToken cancellationToken = default)
@@ -96,6 +98,12 @@ public sealed class IngestBatchHandler : IRequestHandler<IngestBatchCommand, Ing
         batch.UpdateCounts(acceptedCount, rejectedCount, acceptedCount);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _metricRecorder.Increment(MetricDefinitions.BatchesReceived);
+        _metricRecorder.Increment(MetricDefinitions.TransactionsIngested, acceptedCount);
+
+        if (rejectedCount > 0)
+            _metricRecorder.Increment(MetricDefinitions.TransactionsRejected, rejectedCount);
 
         _observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
 

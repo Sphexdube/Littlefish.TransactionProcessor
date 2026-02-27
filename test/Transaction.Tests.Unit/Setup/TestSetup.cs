@@ -33,6 +33,8 @@ internal static class TestSetup
         services.AddSingleton<IObservabilityManager>(sp =>
             new ObservabilityManager(sp.GetRequiredService<ILogger<ObservabilityManager>>()));
 
+        services.AddSingleton<IMetricRecorder>(Substitute.For<IMetricRecorder>());
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<IBatchRepository, BatchRepository>();

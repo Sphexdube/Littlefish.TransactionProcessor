@@ -11,6 +11,8 @@ internal static class WorkerDependencies
         services.AddSingleton<IObservabilityManager>(sp =>
             new ObservabilityManager(sp.GetRequiredService<ILogger<ObservabilityManager>>()));
 
+        services.AddSingleton<IMetricRecorder, MetricRecorder>();
+
         services.AddHostedService<OutboxRelayWorker>();
 
         return services;

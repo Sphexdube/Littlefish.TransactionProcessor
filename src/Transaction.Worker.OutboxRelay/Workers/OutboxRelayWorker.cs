@@ -10,6 +10,7 @@ public sealed class OutboxRelayWorker : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IObservabilityManager _observabilityManager;
+    private readonly IMetricRecorder _metricRecorder;
     private readonly int _batchSize;
     private readonly TimeSpan _pollingInterval;
     private readonly string _queueName;
@@ -17,10 +18,12 @@ public sealed class OutboxRelayWorker : BackgroundService
     public OutboxRelayWorker(
         IServiceScopeFactory scopeFactory,
         IObservabilityManager observabilityManager,
+        IMetricRecorder metricRecorder,
         IConfiguration configuration)
     {
         _scopeFactory = scopeFactory;
         _observabilityManager = observabilityManager;
+        _metricRecorder = metricRecorder;
         _batchSize = configuration.GetValue<int>("OutboxRelay:BatchSize", 100);
         _pollingInterval = TimeSpan.FromSeconds(configuration.GetValue<int>("OutboxRelay:PollingIntervalSeconds", 1));
         _queueName = configuration.GetValue<string>("OutboxRelay:QueueName") ?? "transactions-ingest";
@@ -42,6 +45,7 @@ public sealed class OutboxRelayWorker : BackgroundService
             }
             catch (Exception ex)
             {
+                _metricRecorder.Increment(MetricDefinitions.OutboxRelayErrors);
                 _observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayUnexpectedError, ex.Message)).AsError();
             }
 
@@ -79,6 +83,7 @@ public sealed class OutboxRelayWorker : BackgroundService
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
+        _metricRecorder.Increment(MetricDefinitions.OutboxMessagesRelayed, messages.Count);
         _observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayedMessages, messages.Count)).AsInfo();
     }
 }
