@@ -6,6 +6,6 @@ public static class HealthCheckRegistration
 {
     public static void Register(IHealthChecksBuilder builder)
     {
-        builder.AddDbContextCheck<TransactionDbContext>("database");
+        builder.AddDbContextCheck<TransactionDbContext>("database", tags: ["ready"]);
     }
 }

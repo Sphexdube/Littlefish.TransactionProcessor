@@ -65,7 +65,8 @@ var serviceBus = builder
 
 builder.AddProject<Projects.Transaction_Presentation_Api>("transaction-api")
     .WithReference(transactionDb)
-    .WaitFor(grate);
+    .WaitFor(grate)
+    .WithHttpHealthCheck("/health");
 
 builder.AddProject<Projects.Transaction_Worker_OutboxRelay>("outbox-relay")
     .WithReference(transactionDb)

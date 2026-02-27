@@ -14,7 +14,7 @@ internal static class DatabaseDependencies
             options.UseSqlServer(configuration.GetConnectionString("TransactionDb")));
 
         services.AddHealthChecks()
-            .AddDbContextCheck<TransactionDbContext>("database");
+            .AddDbContextCheck<TransactionDbContext>("database", tags: ["ready"]);
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IOutboxMessageRepository, OutboxMessageRepository>();
