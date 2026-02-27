@@ -1,170 +1,48 @@
 # Littlefish Transaction Processor
 
-A .NET 9 multi-tenant transaction processing system built with Clean Architecture and .NET Aspire.
+A .NET 9 multi-tenant transaction processing system built with Clean Architecture and .NET Aspire. The service accepts batches of financial transactions via a REST API, persists them atomically alongside an outbox record, relays those records to Azure Service Bus, and evaluates them against configurable business rules in an independent worker process.
 
-## Prerequisites
+## Table of Contents
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9)
-- [.NET Aspire workload / SDK 9.1.0](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/setup-tooling)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (required by Aspire to run SQL Server)
-- [dotnet-ef global tool](https://learn.microsoft.com/en-us/ef/core/cli/dotnet) for migrations
+1. [Solution](/docs/solution/solution.md)
+2. [Application](/docs/application/application.md)
+3. [Deployment](/docs/deployment/deployment.md)
+4. [Local Development](/docs/development/local-development.md)
 
-Install the EF tool if you haven't already:
-```bash
-dotnet tool install --global dotnet-ef
-```
+## Database Architecture
 
-## Running the Application
+### Database (`dbTransactionProcessor`)
 
-### 1. Clone and restore
-
-```bash
-git clone <repo-url>
-cd Littlefish.TransactionProcessor
-dotnet restore src/Littlefish.TransactionProcessor.sln
-```
-
-### 2. Start via Aspire AppHost (recommended)
-
-The AppHost orchestrates SQL Server (in Docker), the REST API, and the background worker:
-
-```bash
-dotnet run --project src/Littlefish.TransactionProcessor.AppHost
-```
-
-The Aspire dashboard opens at **https://localhost:15888** and shows live logs and traces for all services.
-
-| Service | URL (default) |
+| Table | Description |
 |---|---|
-| Aspire Dashboard | https://localhost:15888 |
-| Transaction API | https://localhost:7xxx (shown in dashboard) |
-| Swagger UI | https://\<api-url\>/swagger |
+| `Transactions` | Core transaction records — one row per transaction |
+| `Batches` | Ingestion batch metadata (accepted/rejected counts) |
+| `Tenants` | Multi-tenant configuration including daily limit and high-value threshold |
+| `MerchantDailySummaries` | Aggregated daily purchase spend per merchant per tenant |
+| `OutboxMessages` | Transactional outbox — unpublished messages queued for Service Bus relay |
 
-### 3. Apply database migrations
+### Lookup Tables
 
-Once SQL Server is running (Aspire starts it automatically), run:
+| Table | Values |
+|---|---|
+| `TransactionTypes` | `Purchase`, `Refund` |
+| `TransactionStatuses` | `Received`, `Processing`, `Processed`, `Rejected`, `Review` |
+| `BatchStatuses` | `Pending`, `Processing`, `Completed`, `PartiallyRejected` |
 
-```bash
-dotnet ef database update \
-  --project src/Transaction.Infrastructure.Persistence \
-  --startup-project src/Transaction.Presentation.Api
-```
+## Key Features
 
-### 4. Run tests
+- Multi-tenant transaction ingestion via a batch REST API (`POST /transactions/:ingest`)
+- Transactional Outbox Pattern — DB write and outbox record are committed atomically; no lost messages on crash
+- Azure Service Bus relay via `OutboxRelayWorker` (polls outbox at 1-second intervals, batch size 100)
+- Business rule evaluation in `TransactionProcessingWorker` — four rules evaluated per transaction:
+  - Negative purchase amount → Rejected
+  - Refund without a matching original Purchase → Rejected
+  - Daily merchant purchase limit exceeded → Rejected
+  - Amount exceeds high-value threshold → Flagged for Review
+- Optimistic concurrency with up to 3 retries on `MerchantDailySummary` (`rowversion` column)
+- Dead-letter, abandon, and retry patterns on Service Bus message processing
+- 14 custom OpenTelemetry metrics exported via OTLP (`transactions.*`, `batches.*`, `outbox.*`, `servicebus.*`)
+- Three health endpoints: `/health` (all checks), `/health/ready` (readiness), `/alive` (liveness)
+- Aspire-orchestrated local development — SQL Server + Azure Service Bus emulator run in Docker; Grate applies schema migrations automatically on startup
 
-```bash
-dotnet test src/Littlefish.TransactionProcessor.sln
-```
-
-## Architecture
-
-```
-Littlefish.TransactionProcessor/
-├── src/
-│   ├── Littlefish.TransactionProcessor.AppHost/        # .NET Aspire orchestration
-│   ├── Littlefish.TransactionProcessor.ServiceDefaults/ # Shared telemetry / health checks
-│   │
-│   ├── Transaction.Presentation.Api/                   # ASP.NET Core REST API
-│   ├── Transaction.Worker.Processor/                   # Background transaction processor
-│   │
-│   ├── Transaction.Application.Handlers/               # CQRS command/query handlers
-│   ├── Transaction.Application.Models/                 # Request/response DTOs
-│   ├── Transaction.Application.Validators/             # FluentValidation validators
-│   ├── Transaction.Application.Constants/              # Shared constants / error messages
-│   │
-│   ├── Transaction.Domain.Entities/                    # Domain entities + exceptions
-│   ├── Transaction.Domain.Interfaces/                  # Repository + unit-of-work contracts
-│   ├── Transaction.Domain.Rules/                       # Business rule engine + 4 rules
-│   ├── Transaction.Domain.Observability/               # IObservabilityManager abstraction
-│   │
-│   └── Transaction.Infrastructure.Persistence/         # EF Core, repositories, migrations
-└── test/
-    ├── Transaction.Tests.Unit/                          # Unit tests
-    └── Transaction.Tests.Integration/                  # Integration tests
-```
-
-### Key Design Decisions
-
-**Clean Architecture** — Domain is dependency-free. Application depends on Domain. Infrastructure and Presentation depend on Application.
-
-**CQRS-style handlers** — Every API operation is handled by an `IRequestHandler<TRequest, TResponse>`. Controllers are thin and delegate via `ProcessRequest` / `ProcessRequestAccepted` helpers on `BaseController`.
-
-**Multi-tenancy** — Every endpoint is scoped under `api/v{version}/tenants/{tenantId:guid}/...`. Tenant existence is validated in handlers (throws `NotFoundException` → 404 via middleware).
-
-**Decoupled ingestion and processing** — The API ingests batches and records transactions with `Status = Received`. The Worker polls every 5 seconds and processes them asynchronously.
-
-**Optimistic concurrency** — `MerchantDailySummary` has a SQL Server `rowversion` column. Concurrent workers racing to update the same merchant's daily total will retry up to 3 times on `DbUpdateConcurrencyException`.
-
-## API Reference
-
-### Ingest Transaction Batch
-
-```
-POST /api/v1/tenants/{tenantId}/transactions/:ingest
-X-Correlation-Id: <uuid>
-Content-Type: application/json
-
-{
-  "batchSize": 2,
-  "transactions": [
-    {
-      "transactionId": "TXN-001",
-      "merchantId":    "MERCHANT-001",
-      "amount":        99.99,
-      "currency":      "ZAR",
-      "type":          "Purchase",
-      "occurredAt":    "2025-01-15T10:00:00Z"
-    },
-    {
-      "transactionId":          "TXN-002",
-      "merchantId":             "MERCHANT-001",
-      "amount":                 25.00,
-      "currency":               "ZAR",
-      "type":                   "Refund",
-      "occurredAt":             "2025-01-15T11:00:00Z",
-      "originalTransactionId":  "TXN-001"
-    }
-  ]
-}
-```
-
-Returns `202 Accepted` with `{ "batchId": "<uuid>", "transactionCount": 2 }`.
-
-### Get Transaction Status
-
-```
-GET /api/v1/tenants/{tenantId}/transactions/{transactionId}
-```
-
-Returns `200 OK` with transaction details, or `404 Not Found`.
-
-### Get Merchant Daily Summary
-
-```
-GET /api/v1/tenants/{tenantId}/merchants/{merchantId}/daily-summary?date=2025-01-15
-```
-
-Returns `200 OK` with `{ "merchantId", "date", "totalAmount", "transactionCount" }`, or `404 Not Found`.
-
-## Business Rules
-
-Rules are evaluated in order. Processing stops on the first **Reject** result; a **Review** result allows continued processing.
-
-| # | Rule | Outcome |
-|---|---|---|
-| 1 | `NegativePurchaseAmountRule` — amount ≤ 0 on a Purchase | Rejected |
-| 2 | `RefundRequiresOriginalPurchaseRule` — Refund must reference an existing Purchase | Rejected |
-| 3 | `DailyMerchantLimitRule` — projected Purchase total > tenant's daily limit | Rejected |
-| 4 | `HighValueReviewRule` — amount > tenant's high-value threshold | Review (manual review required) |
-
-## Transaction Lifecycle
-
-```
-Received → Processing → Processed
-                      → Rejected  (failed a rule)
-                      → Review    (passed rules but flagged for manual review)
-```
-
-## Health Checks
-
-Both the API and the Worker expose `/healthz` (configured via Aspire service defaults) with an EF Core database connectivity check.
+**<p style="text-align: center;">Copyright © 2025 Littlefish</p>**
