@@ -16,7 +16,7 @@ namespace Transaction.Presentation.Api.Controllers.V1;
 /// Controller for managing transaction ingestion and retrieval.
 /// </summary>
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/tenants/{tenantId:guid}/[controller]")]
+[Route("api/v{version:apiVersion}/tenants/{tenantId:guid}")]
 public sealed class TransactionsController(
     ILogger<TransactionsController> logger,
     IRequestHandler<IngestBatchCommand, IngestBatchResponse> ingestHandler,
@@ -29,7 +29,7 @@ public sealed class TransactionsController(
     /// <param name="tenantId">The tenant identifier.</param>
     /// <param name="request">The batch of transactions to ingest.</param>
     /// <param name="correlationId">The correlation identifier for tracking the request.</param>
-    [HttpPost(":ingest")]
+    [HttpPost("transactions:ingest")]
     [ProducesResponseType(typeof(IngestBatchResponse), (int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -52,7 +52,7 @@ public sealed class TransactionsController(
     /// </summary>
     /// <param name="tenantId">The tenant identifier.</param>
     /// <param name="transactionId">The transaction identifier.</param>
-    [HttpGet("{transactionId}")]
+    [HttpGet("transactions/{transactionId}")]
     [ProducesResponseType(typeof(TransactionResponse), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> GetTransactionAsync(
         Guid tenantId,

@@ -1,5 +1,4 @@
 <Solution>
-  <Project Path="../test/Transaction.Tests.Integration/Transaction.Tests.Integration.csproj" />
   <Project Path="../test/Transaction.Tests.Unit/Transaction.Tests.Unit.csproj" />
   <Project Path="Littlefish.TransactionProcessor.AppHost/Littlefish.TransactionProcessor.AppHost.csproj" />
   <Project Path="Littlefish.TransactionProcessor.ServiceDefaults/Littlefish.TransactionProcessor.ServiceDefaults.csproj" />
