@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Littlefish.TransactionProcessor.ServiceDefaults\Littlefish.TransactionProcessor.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Transaction.Domain.Interfaces\Transaction.Domain.Interfaces.csproj" />
+    <ProjectReference Include="..\Transaction.Domain.Observability\Transaction.Domain.Observability.csproj" />
     <ProjectReference Include="..\Transaction.Infrastructure.Messaging\Transaction.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="..\Transaction.Infrastructure.Persistence\Transaction.Infrastructure.Persistence.csproj" />
   </ItemGroup>

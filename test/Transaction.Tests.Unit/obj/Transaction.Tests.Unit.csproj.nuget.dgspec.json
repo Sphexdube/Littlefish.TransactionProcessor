@@ -194,6 +194,9 @@
               },
               "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj": {
                 "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Interfaces/Transaction.Domain.Interfaces.csproj"
+              },
+              "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Observability/Transaction.Domain.Observability.csproj": {
+                "projectPath": "/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/src/Transaction.Domain.Observability/Transaction.Domain.Observability.csproj"
               }
             }
           }
@@ -594,6 +597,12 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Transaction.Application.Models\Transaction.Application.Models.csproj" />
     <ProjectReference Include="..\Transaction.Domain.Entities\Transaction.Domain.Entities.csproj" />
     <ProjectReference Include="..\Transaction.Domain.Interfaces\Transaction.Domain.Interfaces.csproj" />
+    <ProjectReference Include="..\Transaction.Domain.Observability\Transaction.Domain.Observability.csproj" />
     <ProjectReference Include="..\Transaction.Domain.Rules\Transaction.Domain.Rules.csproj" />
     <ProjectReference Include="..\Transaction.Infrastructure.Persistence\Transaction.Infrastructure.Persistence.csproj" />
   </ItemGroup>

@@ -16,29 +16,26 @@ public class ExceptionHandlingMiddleware(IObservabilityManager observabilityMana
         }
         catch (Exception ex)
         {
-            await HandleExceptionMessages(context, ex);
+            await HandleExceptionAsync(context, ex);
         }
     }
 
-    private async Task HandleExceptionMessages(HttpContext context, Exception exception)
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
-
         Exception baseException = exception.GetBaseException();
         switch (baseException)
         {
             case NotFoundException:
-                await HandleNotFoundResponse(context, baseException);
+                observabilityManager.LogMessage(baseException.Message).AsError();
+                await HandleNotFoundResponseAsync(context, baseException);
                 break;
             default:
                 throw exception;
         }
     }
 
-    private async Task HandleNotFoundResponse(HttpContext context, Exception exception)
+    private static async Task HandleNotFoundResponseAsync(HttpContext context, Exception exception)
     {
-        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
-
         context.Response.StatusCode = StatusCodes.Status404NotFound;
         await context.Response.WriteAsync(exception.Message);
     }

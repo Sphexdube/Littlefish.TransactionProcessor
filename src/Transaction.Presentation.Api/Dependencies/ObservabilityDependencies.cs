@@ -1,5 +1,5 @@
+using Transaction.Domain.Observability;
 using Transaction.Domain.Observability.Contracts;
-using Transaction.Presentation.Api.Observability;
 
 namespace Transaction.Presentation.Api.Dependencies;
 

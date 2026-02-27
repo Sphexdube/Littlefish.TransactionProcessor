@@ -10,6 +10,7 @@ using Transaction.Domain.Entities;
 using Transaction.Domain.Entities.Enums;
 using Transaction.Domain.Entities.Exceptions;
 using Transaction.Domain.Interfaces;
+using Transaction.Domain.Observability.Contracts;
 using Transaction.Infrastructure.Persistence.Context;
 using Transaction.Tests.Unit.Builders;
 using Transaction.Tests.Unit.Models;
@@ -181,7 +182,7 @@ public sealed class IngestBatchHandlerTests
         IUnitOfWork mockUnitOfWork = Substitute.For<IUnitOfWork>();
         mockUnitOfWork.Tenants.Returns(mockTenantRepo);
 
-        IngestBatchHandler handler = new IngestBatchHandler(mockUnitOfWork);
+        IngestBatchHandler handler = new IngestBatchHandler(mockUnitOfWork, Substitute.For<IObservabilityManager>());
 
         IngestBatchCommand command = new IngestTransactionBatchRequest
         {

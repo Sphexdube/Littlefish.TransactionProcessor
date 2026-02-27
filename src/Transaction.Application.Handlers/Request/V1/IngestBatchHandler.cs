@@ -7,20 +7,26 @@ using Transaction.Domain.Entities;
 using Transaction.Domain.Entities.Enums;
 using Transaction.Domain.Entities.Exceptions;
 using Transaction.Domain.Interfaces;
+using Transaction.Domain.Observability;
+using Transaction.Domain.Observability.Contracts;
 
 namespace Transaction.Application.Handlers.Request.V1;
 
 public sealed class IngestBatchHandler : IRequestHandler<IngestBatchCommand, IngestBatchResponse>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IObservabilityManager _observabilityManager;
 
-    public IngestBatchHandler(IUnitOfWork unitOfWork)
+    public IngestBatchHandler(IUnitOfWork unitOfWork, IObservabilityManager observabilityManager)
     {
         _unitOfWork = unitOfWork;
+        _observabilityManager = observabilityManager;
     }
 
     public async Task<IngestBatchResponse> HandleAsync(IngestBatchCommand command, CancellationToken cancellationToken = default)
     {
+        _observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+
         if (await _unitOfWork.Tenants.GetByIdAsync(command.TenantId, cancellationToken) == null)
             throw new NotFoundException(ErrorMessages.TenantNotFound);
 
@@ -90,6 +96,8 @@ public sealed class IngestBatchHandler : IRequestHandler<IngestBatchCommand, Ing
         batch.UpdateCounts(acceptedCount, rejectedCount, acceptedCount);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
 
         return new IngestBatchResponse
         {

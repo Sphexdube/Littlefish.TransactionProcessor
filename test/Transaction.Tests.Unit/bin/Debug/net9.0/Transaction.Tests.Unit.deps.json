@@ -2380,7 +2380,8 @@
           "Transaction.Application.Models": "1.0.0",
           "Transaction.Domain.Commands": "1.0.0",
           "Transaction.Domain.Entities": "1.0.0",
-          "Transaction.Domain.Interfaces": "1.0.0"
+          "Transaction.Domain.Interfaces": "1.0.0",
+          "Transaction.Domain.Observability": "1.0.0"
         },
         "runtime": {
           "Transaction.Application.Handlers.dll": {
@@ -2459,6 +2460,9 @@
         }
       },
       "Transaction.Domain.Observability/1.0.0": {
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.4"
+        },
         "runtime": {
           "Transaction.Domain.Observability.dll": {
             "assemblyVersion": "1.0.0.0",

@@ -1,5 +1,7 @@
 using Transaction.Domain.Entities;
 using Transaction.Domain.Interfaces;
+using Transaction.Domain.Observability;
+using Transaction.Domain.Observability.Contracts;
 using Transaction.Infrastructure.Messaging;
 
 namespace Transaction.Worker.OutboxRelay.Workers;
@@ -7,18 +9,18 @@ namespace Transaction.Worker.OutboxRelay.Workers;
 public sealed class OutboxRelayWorker : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ILogger<OutboxRelayWorker> _logger;
+    private readonly IObservabilityManager _observabilityManager;
     private readonly int _batchSize;
     private readonly TimeSpan _pollingInterval;
     private readonly string _queueName;
 
     public OutboxRelayWorker(
         IServiceScopeFactory scopeFactory,
-        ILogger<OutboxRelayWorker> logger,
+        IObservabilityManager observabilityManager,
         IConfiguration configuration)
     {
         _scopeFactory = scopeFactory;
-        _logger = logger;
+        _observabilityManager = observabilityManager;
         _batchSize = configuration.GetValue<int>("OutboxRelay:BatchSize", 100);
         _pollingInterval = TimeSpan.FromSeconds(configuration.GetValue<int>("OutboxRelay:PollingIntervalSeconds", 1));
         _queueName = configuration.GetValue<string>("OutboxRelay:QueueName") ?? "transactions-ingest";
@@ -26,8 +28,7 @@ public sealed class OutboxRelayWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("OutboxRelayWorker started. Polling every {Interval}s, batch size {BatchSize}.",
-            _pollingInterval.TotalSeconds, _batchSize);
+        _observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -41,13 +42,13 @@ public sealed class OutboxRelayWorker : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error in OutboxRelayWorker.");
+                _observabilityManager.LogMessage($"Unexpected error in OutboxRelayWorker: {ex.Message}").AsError();
             }
 
             await Task.Delay(_pollingInterval, stoppingToken);
         }
 
-        _logger.LogInformation("OutboxRelayWorker stopping.");
+        _observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
     }
 
     private async Task ProcessBatchAsync(CancellationToken cancellationToken)
@@ -65,8 +66,7 @@ public sealed class OutboxRelayWorker : BackgroundService
             return;
         }
 
-        _logger.LogInformation("Relaying {Count} outbox message(s) to queue '{Queue}'.",
-            messages.Count, _queueName);
+        _observabilityManager.LogMessage($"Relaying {messages.Count} outbox message(s) to queue '{_queueName}'.").AsInfo();
 
         foreach (OutboxMessage message in messages)
         {
@@ -79,6 +79,6 @@ public sealed class OutboxRelayWorker : BackgroundService
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("Relayed {Count} message(s) successfully.", messages.Count);
+        _observabilityManager.LogMessage($"Relayed {messages.Count} message(s) successfully.").AsInfo();
     }
 }

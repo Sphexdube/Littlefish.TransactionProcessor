@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Transaction.Application.Handlers;
 using Transaction.Application.Handlers.Request.V1;
@@ -10,6 +11,8 @@ using Transaction.Application.Models.Response.V1;
 using Transaction.Application.Validators.V1;
 using Transaction.Domain.Commands;
 using Transaction.Domain.Interfaces;
+using Transaction.Domain.Observability;
+using Transaction.Domain.Observability.Contracts;
 using Transaction.Infrastructure.Persistence;
 using Transaction.Infrastructure.Persistence.Context;
 using Transaction.Infrastructure.Persistence.Repositories;
@@ -25,6 +28,11 @@ internal static class TestSetup
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}"));
 
+        services.AddLogging();
+
+        services.AddSingleton<IObservabilityManager>(sp =>
+            new ObservabilityManager(sp.GetRequiredService<ILogger<ObservabilityManager>>()));
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<IBatchRepository, BatchRepository>();
@@ -37,8 +45,6 @@ internal static class TestSetup
         services.AddScoped<IRequestHandler<GetDailySummaryQuery, DailySummaryResponse>, GetDailySummaryHandler>();
 
         services.AddValidatorsFromAssemblyContaining<IngestTransactionBatchRequestValidator>();
-
-        services.AddLogging();
 
         return services.BuildServiceProvider(validateScopes: false);
     }
