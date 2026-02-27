@@ -8,6 +8,7 @@ using Transaction.Domain.Interfaces;
 using Transaction.Domain.Observability;
 using Transaction.Domain.Observability.Contracts;
 using Transaction.Domain.Rules;
+using Transaction.Worker.Processor;
 
 namespace Transaction.Worker.Processor.Workers;
 
@@ -76,8 +77,8 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
         if (payload == null)
         {
-            _observabilityManager.LogMessage($"Failed to deserialise message {args.Message.MessageId}. Dead-lettering.").AsError();
-            await args.DeadLetterMessageAsync(args.Message, "DeserializationFailed", "Payload could not be deserialised.");
+            _observabilityManager.LogMessage(string.Format(LogMessages.FailedToDeserialiseMessage, args.Message.MessageId)).AsError();
+            await args.DeadLetterMessageAsync(args.Message, ServiceBusReasons.DeserializationFailed, ServiceBusReasons.DeserializationFailedDescription);
             return;
         }
 
@@ -96,14 +97,14 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
                 if (transaction == null)
                 {
-                    _observabilityManager.LogMessage($"TransactionRecord not found for TenantId={payload.TenantId}, TransactionId={payload.TransactionId}. Dead-lettering.").AsWarning();
-                    await args.DeadLetterMessageAsync(args.Message, "NotFound", "TransactionRecord not found in database.");
+                    _observabilityManager.LogMessage(string.Format(LogMessages.TransactionNotFoundDeadLetter, payload.TenantId, payload.TransactionId)).AsWarning();
+                    await args.DeadLetterMessageAsync(args.Message, ServiceBusReasons.NotFound, ServiceBusReasons.NotFoundDescription);
                     return;
                 }
 
                 if (transaction.Status != TransactionStatus.Received)
                 {
-                    _observabilityManager.LogMessage($"Transaction {payload.TransactionId} already processed (Status={transaction.Status}). Completing message (idempotent).").AsInfo();
+                    _observabilityManager.LogMessage(string.Format(LogMessages.TransactionAlreadyProcessed, payload.TransactionId, transaction.Status)).AsInfo();
                     await args.CompleteMessageAsync(args.Message);
                     return;
                 }
@@ -112,8 +113,8 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
                 if (tenant == null)
                 {
-                    _observabilityManager.LogMessage($"Tenant {payload.TenantId} not found. Dead-lettering.").AsError();
-                    await args.DeadLetterMessageAsync(args.Message, "TenantNotFound", $"Tenant {payload.TenantId} not found.");
+                    _observabilityManager.LogMessage(string.Format(LogMessages.TenantNotFoundDeadLetter, payload.TenantId)).AsError();
+                    await args.DeadLetterMessageAsync(args.Message, ServiceBusReasons.TenantNotFound, string.Format(ServiceBusReasons.TenantNotFoundDescriptionFormat, payload.TenantId));
                     return;
                 }
 
@@ -165,7 +166,7 @@ public sealed class TransactionProcessingWorker : BackgroundService
                 await unitOfWork.SaveChangesAsync(args.CancellationToken);
                 await unitOfWork.CommitTransactionAsync(args.CancellationToken);
 
-                _observabilityManager.LogMessage($"Transaction {transaction.TransactionId} processed with status {transaction.Status}.").AsInfo();
+                _observabilityManager.LogMessage(string.Format(LogMessages.TransactionProcessed, transaction.TransactionId, transaction.Status)).AsInfo();
 
                 await args.CompleteMessageAsync(args.Message);
                 return;
@@ -173,12 +174,12 @@ public sealed class TransactionProcessingWorker : BackgroundService
             catch (DbUpdateConcurrencyException) when (attempt < MaxRetries)
             {
                 await unitOfWork.RollbackTransactionAsync(args.CancellationToken);
-                _observabilityManager.LogMessage($"Concurrency conflict processing {payload.TransactionId}, retrying (attempt {attempt}/{MaxRetries}).").AsWarning();
+                _observabilityManager.LogMessage(string.Format(LogMessages.ConcurrencyConflictRetry, payload.TransactionId, attempt, MaxRetries)).AsWarning();
             }
             catch (DbUpdateConcurrencyException)
             {
                 await unitOfWork.RollbackTransactionAsync(args.CancellationToken);
-                _observabilityManager.LogMessage($"Concurrency conflict on {payload.TransactionId} exhausted retries. Abandoning for redelivery.").AsError();
+                _observabilityManager.LogMessage(string.Format(LogMessages.ConcurrencyConflictExhausted, payload.TransactionId)).AsError();
                 await args.AbandonMessageAsync(args.Message);
                 return;
             }
@@ -197,8 +198,8 @@ public sealed class TransactionProcessingWorker : BackgroundService
                 {
                     try { await unitOfWork.RollbackTransactionAsync(args.CancellationToken); } catch { /* ignore */ }
                 }
-                _observabilityManager.LogMessage($"Unexpected error processing transaction {payload.TransactionId}: {ex.Message}").AsError();
-                await args.DeadLetterMessageAsync(args.Message, "UnexpectedError", ex.Message);
+                _observabilityManager.LogMessage(string.Format(LogMessages.UnexpectedErrorProcessingTransaction, payload.TransactionId, ex.Message)).AsError();
+                await args.DeadLetterMessageAsync(args.Message, ServiceBusReasons.UnexpectedError, ex.Message);
                 return;
             }
         }
@@ -206,7 +207,7 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
     private Task OnErrorAsync(ProcessErrorEventArgs args)
     {
-        _observabilityManager.LogMessage($"Service Bus error. Source={args.ErrorSource}, Entity={args.EntityPath}: {args.Exception.Message}").AsError();
+        _observabilityManager.LogMessage(string.Format(LogMessages.ServiceBusError, args.ErrorSource, args.EntityPath, args.Exception.Message)).AsError();
         return Task.CompletedTask;
     }
 }

@@ -24,4 +24,32 @@
     <ProjectReference Include="..\Transaction.Domain.Rules\Transaction.Domain.Rules.csproj" />
     <ProjectReference Include="..\Transaction.Infrastructure.Persistence\Transaction.Infrastructure.Persistence.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+		<Content Update="appsettings.Localhost.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="appsettings.UnitTest.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	  <Content Update="appsettings.Production.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="appsettings.Test.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<Target Name="PostBuild" Condition="'$(Configuration)' == 'Debug'" AfterTargets="PostBuildEvent">
+		<Exec
+			Condition="'$(OS)' == 'Windows_NT'"
+			Command="powershell -ExecutionPolicy Bypass -File &quot;$(SolutionDir)..\build\mermaid\generate-mermaid-png.ps1&quot;" />
+		<Exec
+			Condition="'$(OS)' != 'Windows_NT'"
+			Command="bash &quot;$(SolutionDir)../build/mermaid/generate-mermaid-png.sh&quot;" />
+	</Target>
+
 </Project>

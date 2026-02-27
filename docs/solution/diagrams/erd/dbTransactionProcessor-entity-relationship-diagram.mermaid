@@ -1,0 +1,119 @@
+erDiagram
+    Tenants {
+        uniqueidentifier Id PK
+        nvarchar Name
+        bit IsActive
+        decimal DailyMerchantLimit
+        decimal HighValueThreshold
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    Batches {
+        uniqueidentifier Id PK
+        uniqueidentifier TenantId FK
+        int Status FK
+        int TotalCount
+        int AcceptedCount
+        int RejectedCount
+        int QueuedCount
+        nvarchar CorrelationId
+        datetimeoffset CompletedAt
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    Transactions {
+        uniqueidentifier Id PK
+        uniqueidentifier TenantId FK
+        uniqueidentifier BatchId FK
+        nvarchar TransactionId
+        nvarchar MerchantId
+        decimal Amount
+        nvarchar Currency
+        int Type FK
+        int Status FK
+        datetimeoffset OccurredAt
+        datetimeoffset ProcessedAt
+        nvarchar OriginalTransactionId
+        nvarchar RejectionReason
+        nvarchar Metadata
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    MerchantDailySummaries {
+        uniqueidentifier Id PK
+        uniqueidentifier TenantId FK
+        nvarchar MerchantId
+        date Date
+        decimal TotalAmount
+        int TransactionCount
+        datetimeoffset LastCalculatedAt
+        rowversion Version
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    OutboxMessages {
+        uniqueidentifier Id PK
+        uniqueidentifier TenantId FK
+        nvarchar TransactionId
+        nvarchar Payload
+        bit Published
+        datetimeoffset PublishedAt
+        datetimeoffset CreatedAt
+    }
+
+    RuleWorkflows {
+        int Id PK
+        varchar Name
+        bit IsActive
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    BusinessRules {
+        int Id PK
+        int WorkflowId FK
+        varchar RuleName
+        varchar RuleExpressionType
+        nvarchar Expression
+        nvarchar ErrorMessage
+        varchar SuccessEvent
+        int SortOrder
+        bit IsActive
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    TransactionTypes {
+        int Id PK
+        varchar Name
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    TransactionStatuses {
+        int Id PK
+        varchar Name
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    BatchStatuses {
+        int Id PK
+        varchar Name
+        datetimeoffset CreatedAt
+        datetimeoffset UpdatedAt
+    }
+
+    Tenants ||--|{ Batches : "has"
+    Tenants ||--|{ Transactions : "has"
+    Tenants ||--|{ MerchantDailySummaries : "has"
+    Tenants ||--|{ OutboxMessages : "has"
+    Batches ||--|{ Transactions : "contains"
+    RuleWorkflows ||--|{ BusinessRules : "contains"
+    TransactionTypes ||--|{ Transactions : "classifies"
+    TransactionStatuses ||--|{ Transactions : "tracks"
+    BatchStatuses ||--|{ Batches : "tracks"

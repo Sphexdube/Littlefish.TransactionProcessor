@@ -40,17 +40,14 @@ public sealed class RuleResultTests
     [Test]
     public void NeedsReview_ReturnsValidResultWithReviewFlagAndReason()
     {
-        // Arrange
-        const string reason = "Transaction amount exceeds high-value threshold and requires review";
-
         // Act
-        RuleResult result = RuleResult.NeedsReview(reason);
+        RuleResult result = RuleResult.NeedsReview(RuleMessages.HighValueThresholdReview);
 
         // Assert
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result.IsValid, Is.True);
-            Assert.That(result.ErrorMessage, Is.EqualTo(reason));
+            Assert.That(result.ErrorMessage, Is.EqualTo(RuleMessages.HighValueThresholdReview));
             Assert.That(result.RequiresReview, Is.True);
         }
     }

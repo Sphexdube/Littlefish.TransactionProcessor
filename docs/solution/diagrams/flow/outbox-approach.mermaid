@@ -1,0 +1,20 @@
+---
+title: Outbox approach
+---
+flowchart TB
+    API["Transaction API"]
+    Handler["IngestBatchHandler"]
+    DB(dbTransactionProcessor)
+
+    Outbox["OutboxRelayWorker"]
+    Publisher["ServiceBusPublisher"]
+    ASB(Azure Service Bus)
+
+    Processor["TransactionProcessingWorker"]
+
+    API --Handle Request--> Handler
+    Handler --Store TransactionRecord + OutboxMessage atomically--> DB
+    DB --Poll unpublished messages every 1s--> Outbox
+    Outbox --Publish message payload--> Publisher
+    Publisher --Produce--> ASB
+    ASB --Consume message--> Processor

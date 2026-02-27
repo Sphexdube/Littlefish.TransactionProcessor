@@ -45,7 +45,7 @@ public sealed class IngestBatchHandler : IRequestHandler<IngestBatchCommand, Ing
                 errors.Add(new TransactionValidationError
                 {
                     TransactionId = item.TransactionId,
-                    ErrorMessage = "Duplicate transaction ID"
+                    ErrorMessage = ErrorMessages.DuplicateTransactionId
                 });
                 rejectedCount++;
                 continue;

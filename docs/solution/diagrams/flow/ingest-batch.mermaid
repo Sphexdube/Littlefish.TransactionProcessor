@@ -1,0 +1,36 @@
+---
+title: Ingesting a transaction batch
+---
+flowchart TB
+    source[Source System]
+    api["Transaction API"]
+    validate[Validate Request]
+    handler["IngestBatchHandler"]
+    tenantCheck{"Tenant\nexists?"}
+    batch["Create Batch"]
+    txnLoop[For each transaction]
+    dupCheck{"Duplicate\nTransactionId?"}
+    createTxn["Create TransactionRecord\n(Status = Received)"]
+    createOutbox["Create OutboxMessage\n(Published = false)"]
+    reject[Add to rejected errors]
+    saveDB(dbTransactionProcessor)
+    response["202 Accepted\n(IngestBatchResponse)"]
+    endNode((End))
+
+    source --> api
+    api --> validate
+    validate --> isValid{"Is Request\nvalid?"}
+    isValid --Not valid--> endNode
+    isValid --Valid--> handler
+    handler --> tenantCheck
+    tenantCheck --Not found--> endNode
+    tenantCheck --Found--> batch
+    batch --Store--> saveDB
+    batch --> txnLoop
+    txnLoop --> dupCheck
+    dupCheck --Yes--> reject
+    dupCheck --No--> createTxn
+    createTxn --> createOutbox
+    createOutbox --Atomic save--> saveDB
+    reject --> txnLoop
+    txnLoop --Done--> response

@@ -1,0 +1,42 @@
+---
+title: Processing a transaction
+---
+flowchart TB
+    ASB(Azure Service Bus)
+    worker["TransactionProcessingWorker"]
+    deserialize{"Deserialise\npayload?"}
+    deadLetterDeserialize["Dead-letter\n(DeserializationFailed)"]
+    findTxn{"TransactionRecord\nfound?"}
+    deadLetterNotFound["Dead-letter\n(NotFound)"]
+    alreadyProcessed{"Already\nprocessed?"}
+    complete1["Complete message\n(idempotent)"]
+    findTenant{"Tenant\nfound?"}
+    deadLetterTenant["Dead-letter\n(TenantNotFound)"]
+    ruleEngine["Evaluate business rules\n(RulesEngineAdapter)"]
+    ruleFailure{"Rule\nfailure?"}
+    rejectTxn["Status = Rejected"]
+    reviewRequired{"Requires\nreview?"}
+    markReview["Status = Review"]
+    completeTxn["Status = Processed"]
+    updateSummary["Update MerchantDailySummary\n(Purchase type only)"]
+    commitAndAck["Commit DB transaction\nComplete message"]
+
+    ASB --> worker
+    worker --> deserialize
+    deserialize --Failed--> deadLetterDeserialize
+    deserialize --OK--> findTxn
+    findTxn --Not found--> deadLetterNotFound
+    findTxn --Found--> alreadyProcessed
+    alreadyProcessed --Yes--> complete1
+    alreadyProcessed --No--> findTenant
+    findTenant --Not found--> deadLetterTenant
+    findTenant --Found--> ruleEngine
+    ruleEngine --> ruleFailure
+    ruleFailure --Yes--> rejectTxn
+    ruleFailure --No--> reviewRequired
+    reviewRequired --Yes--> markReview
+    reviewRequired --No--> completeTxn
+    completeTxn --> updateSummary
+    markReview --> updateSummary
+    rejectTxn --> commitAndAck
+    updateSummary --> commitAndAck

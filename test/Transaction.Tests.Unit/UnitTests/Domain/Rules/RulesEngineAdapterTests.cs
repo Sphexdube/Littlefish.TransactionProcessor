@@ -88,7 +88,7 @@ public sealed class RulesEngineAdapterTests
             RuleResult? reviewResult = resultList.FirstOrDefault(r => r.RequiresReview);
             Assert.That(reviewResult, Is.Not.Null);
             Assert.That(reviewResult!.IsValid, Is.True);
-            Assert.That(reviewResult.ErrorMessage, Does.Contain("high-value threshold"));
+            Assert.That(reviewResult.ErrorMessage, Is.EqualTo(RuleMessages.HighValueThresholdReview));
         }
     }
 
@@ -253,24 +253,24 @@ public sealed class RulesEngineAdapterTests
     private static RuleWorkflow BuildStandardWorkflow()
     {
         BusinessRule negativePurchaseAmount = CreateBusinessRule(
-            ruleName: "NegativePurchaseAmount",
+            ruleName: RuleMessages.NegativePurchaseAmountRule,
             expression: "input1.TransactionType != \"Purchase\" || input1.Amount > 0",
-            errorMessage: "PURCHASE amount cannot be negative");
+            errorMessage: RuleMessages.NegativePurchaseAmountError);
 
         BusinessRule refundRequiresOriginalPurchase = CreateBusinessRule(
-            ruleName: "RefundRequiresOriginalPurchase",
+            ruleName: RuleMessages.RefundRequiresOriginalPurchaseRule,
             expression: "input1.TransactionType != \"Refund\" || input1.OriginalPurchaseExists == true",
-            errorMessage: "REFUND must reference an existing PURCHASE transaction");
+            errorMessage: RuleMessages.RefundRequiresOriginalPurchaseError);
 
         BusinessRule dailyMerchantLimit = CreateBusinessRule(
-            ruleName: "DailyMerchantLimit",
+            ruleName: RuleMessages.DailyMerchantLimitRule,
             expression: "input1.TransactionType != \"Purchase\" || input1.ProjectedDailyTotal <= input1.DailyMerchantLimit",
-            errorMessage: "Daily merchant purchase limit would be exceeded");
+            errorMessage: RuleMessages.DailyMerchantLimitError);
 
         BusinessRule highValueReview = CreateBusinessRule(
-            ruleName: "HighValueReview",
+            ruleName: RuleMessages.HighValueReviewRuleName,
             expression: "input1.Amount > input1.HighValueThreshold",
-            successEvent: "REVIEW");
+            successEvent: RuleMessages.ReviewSuccessEvent);
 
         List<BusinessRule> rules =
         [
@@ -280,7 +280,7 @@ public sealed class RulesEngineAdapterTests
             highValueReview
         ];
 
-        return CreateRuleWorkflow("TransactionRules", rules);
+        return CreateRuleWorkflow(RuleMessages.TransactionRulesWorkflow, rules);
     }
 
     private static BusinessRule CreateBusinessRule(
@@ -291,7 +291,7 @@ public sealed class RulesEngineAdapterTests
     {
         BusinessRule rule = (BusinessRule)Activator.CreateInstance(typeof(BusinessRule), nonPublic: true)!;
         SetProperty(rule, nameof(BusinessRule.RuleName), ruleName);
-        SetProperty(rule, nameof(BusinessRule.RuleExpressionType), "LambdaExpression");
+        SetProperty(rule, nameof(BusinessRule.RuleExpressionType), RuleMessages.LambdaExpressionType);
         SetProperty(rule, nameof(BusinessRule.Expression), expression);
         SetProperty(rule, nameof(BusinessRule.ErrorMessage), errorMessage);
         SetProperty(rule, nameof(BusinessRule.SuccessEvent), successEvent);

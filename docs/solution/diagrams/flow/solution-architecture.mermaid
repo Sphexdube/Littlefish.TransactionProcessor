@@ -1,0 +1,77 @@
+flowchart TD
+    controller["Controller"]
+
+    irequestHandler["IRequestHandler"]
+    requestHandler["IngestBatchHandler\nGetTransactionHandler\nGetDailySummaryHandler"]
+    iruleEngine["IRuleEngine"]
+    rulesEngineAdapter["RulesEngineAdapter"]
+    iobservability["IObservabilityManager"]
+    observabilityManager["ObservabilityManager"]
+
+    iunitOfWork["IUnitOfWork"]
+    unitOfWork["UnitOfWork"]
+    irepository["IRepository"]
+    repository["Repository"]
+
+    ipublisher["IServiceBusPublisher"]
+    publisher["ServiceBusPublisher"]
+
+    outboxRelay["OutboxRelayWorker"]
+    txnProcessor["TransactionProcessingWorker"]
+
+    database(("dbTransactionProcessor"))
+    serviceBus(("Azure Service Bus"))
+
+    subgraph Presentation
+        controller
+    end
+
+    subgraph Application
+        irequestHandler
+        requestHandler
+        iruleEngine
+        rulesEngineAdapter
+
+        requestHandler -.implements.-> irequestHandler
+        rulesEngineAdapter -.implements.-> iruleEngine
+    end
+
+    subgraph Domain
+        iobservability
+        observabilityManager
+        observabilityManager -.implements.-> iobservability
+
+        subgraph UnitOfWork
+            iunitOfWork
+            unitOfWork
+            unitOfWork -.implements.-> iunitOfWork
+        end
+
+        subgraph Repository
+            irepository
+            repository
+            repository --reads/writes--> database
+            repository -.implements.-> irepository
+        end
+
+        unitOfWork --creates--> irepository
+    end
+
+    subgraph Infrastructure
+        ipublisher
+        publisher
+        publisher -.implements.-> ipublisher
+        publisher --publishes--> serviceBus
+    end
+
+    subgraph Workers
+        outboxRelay
+        txnProcessor
+        outboxRelay --relay--> ipublisher
+        txnProcessor --consumes--> serviceBus
+        txnProcessor --evaluates--> iruleEngine
+    end
+
+    controller --uses--> irequestHandler
+    requestHandler --uses--> iunitOfWork
+    requestHandler --uses--> iobservability

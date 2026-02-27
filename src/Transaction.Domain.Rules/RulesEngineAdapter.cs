@@ -7,8 +7,6 @@ namespace Transaction.Domain.Rules;
 
 public sealed class RulesEngineAdapter : IRuleEngine
 {
-    private const string WorkflowName = "TransactionRules";
-
     private readonly ITransactionRepository _transactionRepository;
     private readonly IRuleWorkflowRepository _ruleWorkflowRepository;
 
@@ -22,11 +20,11 @@ public sealed class RulesEngineAdapter : IRuleEngine
 
     public async Task<IEnumerable<RuleResult>> EvaluateAllAsync(RuleContext context, CancellationToken cancellationToken = default)
     {
-        RuleWorkflow? workflow = await _ruleWorkflowRepository.GetByNameAsync(WorkflowName, cancellationToken);
+        RuleWorkflow? workflow = await _ruleWorkflowRepository.GetByNameAsync(RuleMessages.TransactionRulesWorkflow, cancellationToken);
 
         if (workflow == null)
         {
-            throw new InvalidOperationException($"Rule workflow '{WorkflowName}' not found in database.");
+            throw new InvalidOperationException(string.Format(RuleMessages.WorkflowNotFound, RuleMessages.TransactionRulesWorkflow));
         }
 
         RulesEngine.RulesEngine rulesEngine = BuildRulesEngine(workflow);
@@ -52,17 +50,17 @@ public sealed class RulesEngineAdapter : IRuleEngine
             ProjectedDailyTotal = context.CurrentDailyMerchantTotal + context.Transaction.Amount
         };
 
-        List<RuleResultTree> ruleResults = await rulesEngine.ExecuteAllRulesAsync(WorkflowName, input);
+        List<RuleResultTree> ruleResults = await rulesEngine.ExecuteAllRulesAsync(RuleMessages.TransactionRulesWorkflow, input);
 
         List<RuleResult> results = new List<RuleResult>();
 
         foreach (RuleResultTree result in ruleResults)
         {
-            if (result.Rule.RuleName == "HighValueReview")
+            if (result.Rule.RuleName == RuleMessages.HighValueReviewRuleName)
             {
                 if (result.IsSuccess)
                 {
-                    results.Add(RuleResult.NeedsReview("Transaction amount exceeds high-value threshold and requires review"));
+                    results.Add(RuleResult.NeedsReview(RuleMessages.HighValueThresholdReview));
                 }
             }
             else

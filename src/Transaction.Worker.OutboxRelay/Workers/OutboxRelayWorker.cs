@@ -42,7 +42,7 @@ public sealed class OutboxRelayWorker : BackgroundService
             }
             catch (Exception ex)
             {
-                _observabilityManager.LogMessage($"Unexpected error in OutboxRelayWorker: {ex.Message}").AsError();
+                _observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayUnexpectedError, ex.Message)).AsError();
             }
 
             await Task.Delay(_pollingInterval, stoppingToken);
@@ -66,7 +66,7 @@ public sealed class OutboxRelayWorker : BackgroundService
             return;
         }
 
-        _observabilityManager.LogMessage($"Relaying {messages.Count} outbox message(s) to queue '{_queueName}'.").AsInfo();
+        _observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayingMessages, messages.Count, _queueName)).AsInfo();
 
         foreach (OutboxMessage message in messages)
         {
@@ -79,6 +79,6 @@ public sealed class OutboxRelayWorker : BackgroundService
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _observabilityManager.LogMessage($"Relayed {messages.Count} message(s) successfully.").AsInfo();
+        _observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayedMessages, messages.Count)).AsInfo();
     }
 }
