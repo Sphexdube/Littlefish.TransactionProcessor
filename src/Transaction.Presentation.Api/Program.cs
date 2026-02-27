@@ -1,29 +1,20 @@
 using Littlefish.TransactionProcessor.ServiceDefaults;
 using Transaction.Presentation.Api.Dependencies;
-using Transaction.Presentation.Api.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-builder.Services
-    .AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-    });
-
-builder.Services.AddSwaggerDependencies();
-builder.Services.AddDatabaseDependencies(builder.Configuration);
-builder.Services.AddObservabilityDependencies();
-builder.Services.AddApplicationDependencies();
+ControllerRegistration.Register(builder.Services);
+DependencyRegistration.Register(builder.Services, builder.Configuration);
 
 WebApplication app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.UseSwaggerDependencies();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseHttpsRedirection();
-app.MapControllers();
+MiddlewareRegistration.Register(app);
+EndpointRegistration.Register(app);
+FeatureRegistration.Register(app, app.Environment);
 
 app.Run();
+
+public partial class Program { }

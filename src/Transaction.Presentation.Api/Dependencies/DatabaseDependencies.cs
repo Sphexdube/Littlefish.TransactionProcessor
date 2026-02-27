@@ -13,8 +13,8 @@ internal static class DatabaseDependencies
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("TransactionDb")));
 
-        services.AddHealthChecks()
-            .AddDbContextCheck<TransactionDbContext>("database");
+        IHealthChecksBuilder healthChecks = services.AddHealthChecks();
+        HealthCheckRegistration.Register(healthChecks);
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();

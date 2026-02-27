@@ -12,7 +12,4 @@
     <ProjectReference Include="..\Transaction.Domain.Entities\Transaction.Domain.Entities.csproj" />
     <ProjectReference Include="..\Transaction.Domain.Interfaces\Transaction.Domain.Interfaces.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Rules\TransactionRules.json" />
-  </ItemGroup>
 </Project>

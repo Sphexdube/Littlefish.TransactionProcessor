@@ -11,7 +11,7 @@ internal static class SwaggerDependencies
     {
         services.AddEndpointsApiExplorer();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(SwaggerRegistration.Register);
 
         services.AddApiVersioning(options =>
         {
@@ -26,24 +26,5 @@ internal static class SwaggerDependencies
           });
 
         return services;
-    }
-
-    internal static WebApplication UseSwaggerDependencies(this WebApplication app)
-    {
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                foreach (Asp.Versioning.ApiExplorer.ApiVersionDescription description in app.DescribeApiVersions())
-                {
-                    options.SwaggerEndpoint(
-                        $"/swagger/{description.GroupName}/swagger.json",
-                        description.GroupName.ToUpperInvariant());
-                }
-            });
-        }
-
-        return app;
     }
 }
