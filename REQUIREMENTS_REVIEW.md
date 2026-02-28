@@ -19,7 +19,7 @@ The spec lists `type (PURCHASE | REFUND | REVERSAL)`. Rules 1–4 cover PURCHASE
 
 The spec says "Accepts a batch (100–5,000 items)." It is unclear whether a batch of fewer than 100 items should be rejected, or whether 100 is a target/recommended minimum.
 
-**Decision taken:** FluentValidation rejects batches with 0 items. The upper bound of 5,000 is enforced. The lower bound of 100 is **not** enforced — partially-filled batches are accepted. This is more permissive than the spec implies, but rejecting a 50-item batch would be surprising to a caller.
+**Decision taken:** FluentValidation enforces both bounds — batches below 100 items or above 5,000 items are rejected with a `400 Bad Request`. This matches the spec exactly.
 
 ### 3. Daily limit scope is underspecified
 
@@ -95,7 +95,7 @@ The spec does not define an authentication scheme. Controllers carry `[Authorize
 
 `POST /api/v1/tenants/{tenantId}/transactions/:ingest` with versioning (`X-Api-Version: 1.0`).
 
-- Accepts a batch of 1–5,000 transactions (upper bound enforced; lower bound permissive).
+- Accepts a batch of 100–5,000 transactions (both bounds enforced by `IngestTransactionBatchRequestValidator`).
 - Validates tenant existence before writing any data — missing tenant returns `404 Not Found`.
 - Persists `TransactionRecord` (Status = `Received`) and `OutboxMessage` atomically in a single `SaveChangesAsync` call (Outbox Pattern).
 - Duplicate `transactionId` within a tenant is detected by `ExistsByTransactionIdAsync` before insert; the item is returned in `errors[]` and excluded from the batch count.

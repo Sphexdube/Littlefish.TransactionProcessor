@@ -1,0 +1,227 @@
+{
+  "info": {
+    "name": "Littlefish Transaction Processor",
+    "_postman_id": "littlefish-transaction-processor",
+    "description": "Postman collection for the Littlefish Transaction Processor API.\n\nSeeded tenants (local):\n- Acme Corporation:  617b6baa-2be4-4e29-984e-a463ea060c47 (daily limit R100,000 | high-value R10,000)\n- Beta Retail Group: 576c6ade-211f-425b-ac8f-4f87e4e6e7f7 (daily limit R50,000  | high-value R5,000)\n- Gamma Finance:     faab094e-a712-4416-91ac-fec7c0cf8da5 (daily limit R250,000 | high-value R25,000)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7001",
+      "type": "string"
+    },
+    {
+      "key": "tenantId",
+      "value": "617b6baa-2be4-4e29-984e-a463ea060c47",
+      "type": "string",
+      "description": "Acme Corporation — change to any seeded tenant GUID"
+    }
+  ],
+  "item": [
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Ingest Batch (100 transactions)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// ── helpers ────────────────────────────────────────────────────────────",
+                  "function uuid() {",
+                  "    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {",
+                  "        var r = Math.random() * 16 | 0;",
+                  "        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);",
+                  "    });",
+                  "}",
+                  "",
+                  "function randomAmount(min, max) {",
+                  "    return parseFloat((Math.random() * (max - min) + min).toFixed(2));",
+                  "}",
+                  "",
+                  "function randomFrom(arr) {",
+                  "    return arr[Math.floor(Math.random() * arr.length)];",
+                  "}",
+                  "",
+                  "function isoNow(offsetMinutes) {",
+                  "    // spread OccurredAt across the last 24 hours",
+                  "    var d = new Date(Date.now() - offsetMinutes * 60 * 1000);",
+                  "    return d.toISOString();",
+                  "}",
+                  "",
+                  "// ── config ─────────────────────────────────────────────────────────────",
+                  "var BATCH_SIZE   = 100;          // must be 100–5000",
+                  "var CURRENCIES   = ['ZAR', 'USD', 'EUR', 'GBP'];",
+                  "var MERCHANT_IDS = [",
+                  "    uuid(), uuid(), uuid()       // 3 random merchants per run",
+                  "];",
+                  "",
+                  "// ~80% PURCHASE, ~10% REFUND, ~10% REVERSAL",
+                  "var TYPE_WEIGHTS = [",
+                  "    { type: 'PURCHASE',  weight: 80 },",
+                  "    { type: 'REFUND',    weight: 10 },",
+                  "    { type: 'REVERSAL',  weight: 10 }",
+                  "];",
+                  "",
+                  "function weightedType() {",
+                  "    var total = TYPE_WEIGHTS.reduce(function (s, t) { return s + t.weight; }, 0);",
+                  "    var r = Math.random() * total;",
+                  "    for (var i = 0; i < TYPE_WEIGHTS.length; i++) {",
+                  "        r -= TYPE_WEIGHTS[i].weight;",
+                  "        if (r <= 0) return TYPE_WEIGHTS[i].type;",
+                  "    }",
+                  "    return 'PURCHASE';",
+                  "}",
+                  "",
+                  "// ── generate transactions ───────────────────────────────────────────────",
+                  "// First pass: generate all PURCHASE ids so REFUNDs can reference them",
+                  "var purchaseIds = [];",
+                  "var transactions = [];",
+                  "",
+                  "for (var i = 0; i < BATCH_SIZE; i++) {",
+                  "    var type       = weightedType();",
+                  "    var txnId      = uuid();",
+                  "    var merchantId = randomFrom(MERCHANT_IDS);",
+                  "    var currency   = randomFrom(CURRENCIES);",
+                  "    var amount     = randomAmount(1, 9000);   // kept under high-value threshold",
+                  "    var occurredAt = isoNow(Math.floor(Math.random() * 1440)); // within last 24h",
+                  "",
+                  "    var txn = {",
+                  "        transactionId:         txnId,",
+                  "        occurredAt:            occurredAt,",
+                  "        amount:                amount,",
+                  "        currency:              currency,",
+                  "        merchantId:            merchantId,",
+                  "        type:                  type,",
+                  "        originalTransactionId: null,",
+                  "        metadata:              { source: 'postman', index: String(i + 1) }",
+                  "    };",
+                  "",
+                  "    if (type === 'PURCHASE') {",
+                  "        purchaseIds.push(txnId);",
+                  "    }",
+                  "",
+                  "    if (type === 'REFUND') {",
+                  "        // If we have prior purchases use one; otherwise convert to PURCHASE",
+                  "        // to satisfy the validator (REFUND requires originalTransactionId)",
+                  "        if (purchaseIds.length > 0) {",
+                  "            txn.originalTransactionId = randomFrom(purchaseIds);",
+                  "        } else {",
+                  "            txn.type = 'PURCHASE';",
+                  "            purchaseIds.push(txnId);",
+                  "        }",
+                  "    }",
+                  "",
+                  "    transactions.push(txn);",
+                  "}",
+                  "",
+                  "// ── set correlation id + body ───────────────────────────────────────────",
+                  "var correlationId = uuid();",
+                  "pm.collectionVariables.set('correlationId', correlationId);",
+                  "pm.collectionVariables.set('generatedBody', JSON.stringify({ transactions: transactions }));",
+                  "",
+                  "console.log('Correlation-Id:', correlationId);",
+                  "console.log('Batch size:',     transactions.length);",
+                  "console.log('Types:', transactions.reduce(function (acc, t) {",
+                  "    acc[t.type] = (acc[t.type] || 0) + 1; return acc;",
+                  "}, {}));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 202 Accepted', function () {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "",
+                  "pm.test('Response has batchId', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('batchId');",
+                  "});",
+                  "",
+                  "pm.test('acceptedCount + rejectedCount equals 100', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.acceptedCount + json.rejectedCount).to.eql(100);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 202) {",
+                  "    var json = pm.response.json();",
+                  "    console.log('batchId:       ', json.batchId);",
+                  "    console.log('acceptedCount: ', json.acceptedCount);",
+                  "    console.log('rejectedCount: ', json.rejectedCount);",
+                  "    console.log('queuedCount:   ', json.queuedCount);",
+                  "    console.log('correlationId: ', json.correlationId);",
+                  "    if (json.errors && json.errors.length > 0) {",
+                  "        console.warn('Errors:', JSON.stringify(json.errors));",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}",
+                "description": "Set by pre-request script"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{generatedBody}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tenants/{{tenantId}}/transactions:ingest",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tenants", "{{tenantId}}", "transactions:ingest"]
+            },
+            "description": "Ingest a batch of 100 randomly generated transactions.\n\nThe pre-request script generates:\n- 100 transactions (the validator minimum)\n- ~80% PURCHASE, ~10% REFUND, ~10% REVERSAL\n- Random amounts (R1–R9,000 — below the Acme high-value threshold of R10,000)\n- Random currencies from ZAR, USD, EUR, GBP\n- REFUND transactions automatically reference a previously generated PURCHASE id\n- A fresh X-Correlation-Id UUID per execution\n\nChange {{tenantId}} to any seeded tenant:\n- Acme Corporation:  617b6baa-2be4-4e29-984e-a463ea060c47\n- Beta Retail Group: 576c6ade-211f-425b-ac8f-4f87e4e6e7f7\n- Gamma Finance:     faab094e-a712-4416-91ac-fec7c0cf8da5"
+          },
+          "response": [
+            {
+              "name": "202 Accepted",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "X-Correlation-Id", "value": "{{correlationId}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{{generatedBody}}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/tenants/{{tenantId}}/transactions:ingest",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "tenants", "{{tenantId}}", "transactions:ingest"]
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"batchId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n  \"acceptedCount\": 95,\n  \"rejectedCount\": 5,\n  \"queuedCount\": 95,\n  \"correlationId\": \"{{correlationId}}\",\n  \"errors\": [\n    {\n      \"transactionId\": \"some-duplicate-id\",\n      \"reason\": \"DuplicateTransactionId\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

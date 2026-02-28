@@ -1,9 +1,12 @@
 {
+  "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "Transaction.Worker.OutboxRelay": {
+    "http": {
       "commandName": "Project",
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5002",
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }

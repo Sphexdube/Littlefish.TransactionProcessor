@@ -10,7 +10,7 @@ public sealed class ObservabilityManager(ILogger logger) : IObservabilityManager
 
 internal sealed class LogBuilder(ILogger logger, string message) : ILogBuilder
 {
-    public void AsInfo()    => logger.LogInformation("{Message}", message);
+    public void AsInfo() => logger.LogInformation("{Message}", message);
     public void AsWarning() => logger.LogWarning("{Message}", message);
-    public void AsError()   => logger.LogError("{Message}", message);
+    public void AsError() => logger.LogError("{Message}", message);
 }

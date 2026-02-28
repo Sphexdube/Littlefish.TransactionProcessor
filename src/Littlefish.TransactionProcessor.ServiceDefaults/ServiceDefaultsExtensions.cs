@@ -5,6 +5,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
@@ -55,11 +56,16 @@ public static class ServiceDefaultsExtensions
 
     private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+        // Prefer Aspire dashboard endpoint when present; this avoids IDE-level OTEL
+        // environment overrides redirecting telemetry away from Aspire.
+        var otlpEndpoint =
+            builder.Configuration["DOTNET_DASHBOARD_OTLP_ENDPOINT_URL"]
+            ?? builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
 
-        if (useOtlpExporter)
+        if (!string.IsNullOrWhiteSpace(otlpEndpoint))
         {
-            builder.Services.AddOpenTelemetry().UseOtlpExporter();
+            builder.Services.AddOpenTelemetry()
+                .UseOtlpExporter(OtlpExportProtocol.Grpc, new Uri(otlpEndpoint));
         }
 
         return builder;

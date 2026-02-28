@@ -2,7 +2,7 @@ using Azure.Messaging.ServiceBus;
 
 namespace Transaction.Infrastructure.Messaging;
 
-public sealed class ServiceBusPublisher : IServiceBusPublisher, IAsyncDisposable
+public sealed class ServiceBusPublisher : IServiceBusPublisher
 {
     private readonly ServiceBusClient _client;
 
@@ -22,10 +22,5 @@ public sealed class ServiceBusPublisher : IServiceBusPublisher, IAsyncDisposable
         };
 
         await sender.SendMessageAsync(message, cancellationToken);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _client.DisposeAsync();
     }
 }
