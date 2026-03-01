@@ -13,9 +13,9 @@ public sealed class MetricRecorder : IMetricRecorder, IDisposable
 
     public MetricRecorder()
     {
-        _meter = new Meter(MeterName);
+        _meter = new(MeterName);
 
-        _counters = new Dictionary<string, Counter<long>>
+        _counters = new()
         {
             [MetricDefinitions.TransactionsIngested] = _meter.CreateCounter<long>(MetricDefinitions.TransactionsIngested, description: "Number of transactions accepted into a batch"),
             [MetricDefinitions.TransactionsProcessed] = _meter.CreateCounter<long>(MetricDefinitions.TransactionsProcessed, description: "Number of transactions successfully processed"),
@@ -32,7 +32,7 @@ public sealed class MetricRecorder : IMetricRecorder, IDisposable
             [MetricDefinitions.ConcurrencyConflicts] = _meter.CreateCounter<long>(MetricDefinitions.ConcurrencyConflicts, description: "Number of optimistic concurrency conflicts encountered"),
         };
 
-        _histograms = new Dictionary<string, Histogram<long>>
+        _histograms = new()
         {
             [MetricDefinitions.ProcessingDuration] = _meter.CreateHistogram<long>(MetricDefinitions.ProcessingDuration, unit: "ms", description: "Time taken to process a transaction from receipt to acknowledgement"),
         };

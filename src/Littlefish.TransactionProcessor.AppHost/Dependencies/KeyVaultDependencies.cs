@@ -8,12 +8,12 @@ internal static class KeyVaultDependencies
     internal static IDistributedApplicationBuilder AddKeyVaultConfiguration(
         this IDistributedApplicationBuilder builder, string dotnetEnvironment)
     {
-        if (string.Equals(dotnetEnvironment, "Localhost", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(dotnetEnvironment, AppHostConstants.EnvironmentLocalhost, StringComparison.OrdinalIgnoreCase))
             return builder;
 
-        string vaultUri = builder.Configuration["AzureKeyVault:VaultUri"]
+        string vaultUri = builder.Configuration[AppHostConstants.AzureKeyVaultVaultUriKey]
             ?? throw new InvalidOperationException(
-                $"AzureKeyVault:VaultUri is required for environment '{dotnetEnvironment}'. " +
+                $"{AppHostConstants.AzureKeyVaultVaultUriKey} is required for environment '{dotnetEnvironment}'. " +
                 "Add it to appsettings.{Environment}.json.");
 
         ((IConfigurationBuilder)builder.Configuration).AddAzureKeyVault(new Uri(vaultUri), new DefaultAzureCredential());

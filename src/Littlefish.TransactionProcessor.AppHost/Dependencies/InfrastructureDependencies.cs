@@ -14,15 +14,15 @@ internal static class InfrastructureDependencies
         string dbScriptsPath = Path.GetFullPath(
             Path.Combine(builder.AppHostDirectory, "..", "dbTransactionProcessor"));
 
-        string grateDbServer = builder.Configuration["ApplicationConfiguration:Grate:DatabaseServer"]
-            ?? throw new InvalidOperationException("ApplicationConfiguration:Grate:DatabaseServer is not configured.");
-        string grateDbName = builder.Configuration["ApplicationConfiguration:Grate:DatabaseName"]
-            ?? throw new InvalidOperationException("ApplicationConfiguration:Grate:DatabaseName is not configured.");
-        string grateDbUser = builder.Configuration["ApplicationConfiguration:Grate:DatabaseUsername"]
-            ?? throw new InvalidOperationException("ApplicationConfiguration:Grate:DatabaseUsername is not configured.");
-        string grateDbTrustCert = builder.Configuration["ApplicationConfiguration:Grate:TrustServerCertificate"] ?? "False";
-        string grateDbPassword = builder.Configuration["Parameters:sql-password"]
-            ?? throw new InvalidOperationException("Parameters:sql-password is not configured.");
+        string grateDbServer = builder.Configuration[AppHostConstants.GrateDatabaseServerKey]
+            ?? throw new InvalidOperationException($"{AppHostConstants.GrateDatabaseServerKey} is not configured.");
+        string grateDbName = builder.Configuration[AppHostConstants.GrateDatabaseNameKey]
+            ?? throw new InvalidOperationException($"{AppHostConstants.GrateDatabaseNameKey} is not configured.");
+        string grateDbUser = builder.Configuration[AppHostConstants.GrateDatabaseUsernameKey]
+            ?? throw new InvalidOperationException($"{AppHostConstants.GrateDatabaseUsernameKey} is not configured.");
+        string grateDbTrustCert = builder.Configuration[AppHostConstants.GrateTrustServerCertificateKey] ?? "False";
+        string grateDbPassword = builder.Configuration[AppHostConstants.SqlPasswordParameterKey]
+            ?? throw new InvalidOperationException($"{AppHostConstants.SqlPasswordParameterKey} is not configured.");
 
         IResourceBuilder<ContainerResource> grate = builder.AddContainer("grate-migration", "erikbra/grate")
             .WithContainerRuntimeArgs("--platform", "linux/amd64")

@@ -5,13 +5,13 @@ internal static class ProjectDependencies
     internal static void AddProjectDependencies(
         this IDistributedApplicationBuilder builder, AppHostResources resources)
     {
-        string otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? string.Empty;
+        string otlpEndpoint = Environment.GetEnvironmentVariable(AppHostConstants.EnvOtelExporterOtlpEndpoint) ?? string.Empty;
 
         builder.AddProject<Projects.Transaction_Presentation_Api>("transaction-api")
             .WithReference(resources.TransactionDb)
             .WaitFor(resources.GrateMigration)
-            .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otlpEndpoint)
-            .WithEnvironment("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+            .WithEnvironment(AppHostConstants.EnvOtelExporterOtlpEndpoint, otlpEndpoint)
+            .WithEnvironment(AppHostConstants.EnvOtelExporterOtlpProtocol, AppHostConstants.OtlpProtocolGrpc)
             .WithHttpHealthCheck("/health");
 
         builder.AddProject<Projects.Transaction_Worker_OutboxRelay>("outbox-relay")
@@ -19,8 +19,8 @@ internal static class ProjectDependencies
             .WithReference(resources.ServiceBus)
             .WaitFor(resources.GrateMigration)
             .WaitFor(resources.ServiceBus)
-            .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otlpEndpoint)
-            .WithEnvironment("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+            .WithEnvironment(AppHostConstants.EnvOtelExporterOtlpEndpoint, otlpEndpoint)
+            .WithEnvironment(AppHostConstants.EnvOtelExporterOtlpProtocol, AppHostConstants.OtlpProtocolGrpc)
             .WithHttpHealthCheck("/health");
 
         builder.AddProject<Projects.Transaction_Worker_Processor>("transaction-worker")
@@ -28,8 +28,8 @@ internal static class ProjectDependencies
             .WithReference(resources.ServiceBus)
             .WaitFor(resources.GrateMigration)
             .WaitFor(resources.ServiceBus)
-            .WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", otlpEndpoint)
-            .WithEnvironment("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc")
+            .WithEnvironment(AppHostConstants.EnvOtelExporterOtlpEndpoint, otlpEndpoint)
+            .WithEnvironment(AppHostConstants.EnvOtelExporterOtlpProtocol, AppHostConstants.OtlpProtocolGrpc)
             .WithHttpHealthCheck("/health");
     }
 }

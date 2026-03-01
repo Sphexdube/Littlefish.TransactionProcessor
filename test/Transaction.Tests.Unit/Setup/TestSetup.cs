@@ -23,7 +23,7 @@ internal static class TestSetup
 {
     internal static ServiceProvider CreateServiceProvider()
     {
-        ServiceCollection services = new ServiceCollection();
+        ServiceCollection services = new();
 
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}"));
