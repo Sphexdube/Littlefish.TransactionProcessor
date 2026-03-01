@@ -673,3 +673,7 @@
 /Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/test/Transaction.Tests.Unit/bin/Debug/net9.0/Transaction.Domain.Observability.pdb
 /Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/test/Transaction.Tests.Unit/bin/Debug/net9.0/Transaction.Domain.Rules.pdb
 /Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/test/Transaction.Tests.Unit/obj/Debug/net9.0/MvcTestingAppManifest.json
+/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/test/Transaction.Tests.Unit/bin/Debug/net9.0/appsettings.Localhost.json
+/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/test/Transaction.Tests.Unit/bin/Debug/net9.0/appsettings.Production.json
+/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/test/Transaction.Tests.Unit/bin/Debug/net9.0/Azure.Extensions.AspNetCore.Configuration.Secrets.dll
+/Users/siphesihledube/DEV/LittleFish/Assessment/Littlefish.TransactionProcessor/test/Transaction.Tests.Unit/bin/Debug/net9.0/Azure.Security.KeyVault.Secrets.dll

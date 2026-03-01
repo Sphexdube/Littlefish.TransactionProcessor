@@ -6,7 +6,7 @@ internal static class FeatureRegistration
 {
     internal static void Register(WebApplication app, IWebHostEnvironment env)
     {
-        if (env.IsDevelopment())
+        if (env.IsDevelopment() || env.IsEnvironment("Localhost"))
         {
             app.UseSwagger();
             app.UseSwaggerUI(options =>

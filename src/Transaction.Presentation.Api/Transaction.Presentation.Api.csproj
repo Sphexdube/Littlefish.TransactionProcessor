@@ -43,13 +43,13 @@
 	  </Content>
 	</ItemGroup>
 
-	<Target Name="PostBuild" Condition="'$(Configuration)' == 'Debug'" AfterTargets="PostBuildEvent">
-		<Exec
-			Condition="'$(OS)' == 'Windows_NT'"
-			Command="powershell -ExecutionPolicy Bypass -File &quot;$(SolutionDir)..\build\mermaid\generate-mermaid-png.ps1&quot;" />
-		<Exec
-			Condition="'$(OS)' != 'Windows_NT'"
-			Command="bash &quot;$(SolutionDir)../build/mermaid/generate-mermaid-png.sh&quot;" />
-	</Target>
+		<Target Name="PostBuild" Condition="'$(Configuration)' == 'Debug'" AfterTargets="PostBuildEvent">
+			<Exec
+				Condition="'$(OS)' == 'Windows_NT' and '$(SolutionDir)' != '' and Exists('$(SolutionDir)..\build\mermaid\generate-mermaid-png.ps1')"
+				Command="powershell -ExecutionPolicy Bypass -File &quot;$(SolutionDir)..\build\mermaid\generate-mermaid-png.ps1&quot;" />
+			<Exec
+				Condition="'$(OS)' != 'Windows_NT' and '$(SolutionDir)' != '' and Exists('$(SolutionDir)../build/mermaid/generate-mermaid-png.sh')"
+				Command="bash &quot;$(SolutionDir)../build/mermaid/generate-mermaid-png.sh&quot;" />
+		</Target>
 
 </Project>

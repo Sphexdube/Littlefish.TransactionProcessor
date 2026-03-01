@@ -1,4 +1,6 @@
+using Azure.Identity;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -75,6 +77,31 @@ public static class ServiceDefaultsExtensions
     {
         builder.Services.AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds Azure Key Vault as a configuration source for all non-Localhost environments.
+    /// Localhost reads directly from appsettings.Localhost.json.
+    /// All other environments (Development, Test, Production) read secrets from the vault
+    /// whose URI is defined in appsettings.{Environment}.json under AzureKeyVault:VaultUri.
+    /// Azure Key Vault secret naming: replace ':' with '--' (e.g. ConnectionStrings--TransactionDb).
+    /// </summary>
+    public static TBuilder AddKeyVaultConfiguration<TBuilder>(this TBuilder builder)
+        where TBuilder : IHostApplicationBuilder
+    {
+        if (builder.Environment.IsEnvironment("Localhost"))
+        {
+            return builder;
+        }
+
+        string vaultUri = builder.Configuration["AzureKeyVault:VaultUri"]
+            ?? throw new InvalidOperationException(
+                $"AzureKeyVault:VaultUri is required for environment '{builder.Environment.EnvironmentName}'. " +
+                "Add it to appsettings.{Environment}.json.");
+
+        ((IConfigurationBuilder)builder.Configuration).AddAzureKeyVault(new Uri(vaultUri), new DefaultAzureCredential());
 
         return builder;
     }

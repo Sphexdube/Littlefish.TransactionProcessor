@@ -7,7 +7,7 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:17185;http://localhost:15210",
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Localhost"
       }
     },
     "http": {

@@ -4,6 +4,7 @@ using Transaction.Presentation.Api.Dependencies;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddKeyVaultConfiguration();
 
 ControllerRegistration.Register(builder.Services);
 DependencyRegistration.Register(builder.Services, builder.Configuration);
