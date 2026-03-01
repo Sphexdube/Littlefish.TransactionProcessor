@@ -43,8 +43,7 @@ public sealed class TransactionsController(
         return await ProcessRequestAccepted(
             validator.ValidateAsync,
             (req, ct) => ingestHandler.HandleAsync(req.BuildCommand(tenantId, correlationId), ct),
-            request,
-            new Dictionary<string, string> { { RequestHeaderKeys.CorrelationId, correlationId } });
+            request);
     }
 
     /// <summary>

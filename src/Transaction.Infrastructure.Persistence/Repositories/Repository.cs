@@ -24,11 +24,6 @@ public class Repository<TEntity, TId> : IRepository<TEntity, TId>
         return await DbSet.FindAsync(new object[] { id }, cancellationToken);
     }
 
-    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        return await DbSet.ToListAsync(cancellationToken);
-    }
-
     public virtual async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
         return await DbSet.Where(predicate).ToListAsync(cancellationToken);

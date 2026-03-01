@@ -9,6 +9,4 @@ public static class DefaultTestIds
     public static string CorrelationId { get; } = "CORR-TEST-001";
 
     public static string TransactionId { get; } = "TXN-TEST-001";
-
-    public static Guid BatchId { get; } = Guid.Parse("b2000000-0000-0000-0000-000000000002");
 }

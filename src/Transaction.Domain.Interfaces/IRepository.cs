@@ -9,8 +9,6 @@ public interface IRepository<TEntity, TId>
 {
     Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
-
     Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
 
     Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);
