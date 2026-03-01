@@ -29,7 +29,7 @@ public sealed class Batch : Entity<Guid>
 
     public static Batch Create(Guid tenantId, int totalCount, string correlationId)
     {
-        return new Batch
+        return new()
         {
             Id = Guid.NewGuid(),
             TenantId = tenantId,

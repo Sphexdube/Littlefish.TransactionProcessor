@@ -5,13 +5,9 @@ using Transaction.Infrastructure.Persistence.Context;
 
 namespace Transaction.Infrastructure.Persistence.Repositories;
 
-public class MerchantDailySummaryRepository : Repository<MerchantDailySummary, Guid>, IMerchantDailySummaryRepository
+public class MerchantDailySummaryRepository(TransactionDbContext context)
+    : Repository<MerchantDailySummary, Guid>(context), IMerchantDailySummaryRepository
 {
-    public MerchantDailySummaryRepository(TransactionDbContext context)
-        : base(context)
-    {
-    }
-
     public async Task<MerchantDailySummary?> GetByMerchantAndDateAsync(
         Guid tenantId,
         string merchantId,

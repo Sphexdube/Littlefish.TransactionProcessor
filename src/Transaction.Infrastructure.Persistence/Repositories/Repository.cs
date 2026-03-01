@@ -6,18 +6,12 @@ using Transaction.Infrastructure.Persistence.Context;
 
 namespace Transaction.Infrastructure.Persistence.Repositories;
 
-public class Repository<TEntity, TId> : IRepository<TEntity, TId>
+public class Repository<TEntity, TId>(TransactionDbContext context) : IRepository<TEntity, TId>
     where TEntity : Entity<TId>
     where TId : struct
 {
-    protected readonly TransactionDbContext Context;
-    protected readonly DbSet<TEntity> DbSet;
-
-    public Repository(TransactionDbContext context)
-    {
-        Context = context;
-        DbSet = context.Set<TEntity>();
-    }
+    protected readonly TransactionDbContext Context = context;
+    protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
 
     public virtual async Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {

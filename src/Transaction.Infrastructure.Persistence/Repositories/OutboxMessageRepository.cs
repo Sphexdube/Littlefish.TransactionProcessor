@@ -5,12 +5,9 @@ using Transaction.Infrastructure.Persistence.Context;
 
 namespace Transaction.Infrastructure.Persistence.Repositories;
 
-public sealed class OutboxMessageRepository : Repository<OutboxMessage, Guid>, IOutboxMessageRepository
+public sealed class OutboxMessageRepository(TransactionDbContext context)
+    : Repository<OutboxMessage, Guid>(context), IOutboxMessageRepository
 {
-    public OutboxMessageRepository(TransactionDbContext context) : base(context)
-    {
-    }
-
     public async Task<IReadOnlyList<OutboxMessage>> GetUnpublishedAsync(int batchSize, CancellationToken cancellationToken = default)
     {
         return await DbSet

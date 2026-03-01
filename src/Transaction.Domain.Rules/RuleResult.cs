@@ -4,16 +4,16 @@ public record RuleResult(bool IsValid, string? ErrorMessage = null, bool Require
 {
     public static RuleResult Success()
     {
-        return new RuleResult(IsValid: true);
+        return new(IsValid: true);
     }
 
     public static RuleResult Failure(string errorMessage)
     {
-        return new RuleResult(IsValid: false, errorMessage);
+        return new(IsValid: false, errorMessage);
     }
 
     public static RuleResult NeedsReview(string reason)
     {
-        return new RuleResult(IsValid: true, reason, RequiresReview: true);
+        return new(IsValid: true, reason, RequiresReview: true);
     }
 }

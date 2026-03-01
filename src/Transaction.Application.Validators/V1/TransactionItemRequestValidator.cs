@@ -1,4 +1,5 @@
 using FluentValidation;
+using Transaction.Application.Constants;
 using Transaction.Application.Models.Request.V1;
 
 namespace Transaction.Application.Validators.V1;
@@ -11,31 +12,31 @@ public class TransactionItemRequestValidator : AbstractValidator<TransactionItem
     {
         RuleFor(x => x.TransactionId)
             .NotEmpty()
-            .WithMessage("Transaction ID is required");
+            .WithMessage(ValidationMessages.TransactionIdRequired);
 
         RuleFor(x => x.MerchantId)
             .NotEmpty()
-            .WithMessage("Merchant ID is required");
+            .WithMessage(ValidationMessages.MerchantIdRequired);
 
         RuleFor(x => x.Currency)
             .NotEmpty()
-            .WithMessage("Currency is required")
+            .WithMessage(ValidationMessages.CurrencyRequired)
             .Length(3)
-            .WithMessage("Currency must be 3 characters");
+            .WithMessage(ValidationMessages.CurrencyInvalidLength);
 
         RuleFor(x => x.Type)
             .NotEmpty()
-            .WithMessage("Transaction type is required")
+            .WithMessage(ValidationMessages.TypeRequired)
             .Must(t => ValidTransactionTypes.Contains(t.ToUpperInvariant()))
-            .WithMessage("Transaction type must be PURCHASE, REFUND, or REVERSAL");
+            .WithMessage(ValidationMessages.TypeInvalid);
 
         RuleFor(x => x.OccurredAt)
             .NotEmpty()
-            .WithMessage("OccurredAt timestamp is required");
+            .WithMessage(ValidationMessages.OccurredAtRequired);
 
         RuleFor(x => x.OriginalTransactionId)
             .NotEmpty()
             .When(x => x.Type.Equals("REFUND", StringComparison.OrdinalIgnoreCase))
-            .WithMessage("OriginalTransactionId is required for REFUND transactions");
+            .WithMessage(ValidationMessages.OriginalTransactionIdRequiredForRefund);
     }
 }

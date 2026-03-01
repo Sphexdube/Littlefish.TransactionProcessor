@@ -5,13 +5,9 @@ using Transaction.Infrastructure.Persistence.Context;
 
 namespace Transaction.Infrastructure.Persistence.Repositories;
 
-public class TransactionRepository : Repository<TransactionRecord, Guid>, ITransactionRepository
+public class TransactionRepository(TransactionDbContext context)
+    : Repository<TransactionRecord, Guid>(context), ITransactionRepository
 {
-    public TransactionRepository(TransactionDbContext context)
-        : base(context)
-    {
-    }
-
     public async Task<TransactionRecord?> GetByTransactionIdAsync(
         Guid tenantId,
         string transactionId,

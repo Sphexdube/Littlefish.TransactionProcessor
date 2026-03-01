@@ -91,7 +91,7 @@ public static class ServiceDefaultsExtensions
     public static TBuilder AddKeyVaultConfiguration<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
     {
-        if (builder.Environment.IsEnvironment("Localhost"))
+        if (builder.Environment.IsEnvironment("Localhost") || builder.Environment.IsEnvironment("Test"))
         {
             return builder;
         }

@@ -16,7 +16,7 @@ public abstract class BaseControllerTests : ApiUnitTestBase
             return;
         }
 
-        TransactionsClient = new TransactionsClient(HttpClient);
-        MerchantsClient = new MerchantsClient(HttpClient);
+        TransactionsClient = new(HttpClient);
+        MerchantsClient = new(HttpClient);
     }
 }

@@ -24,7 +24,7 @@ public sealed class MerchantDailySummary : Entity<Guid>
 
     public static MerchantDailySummary Create(Guid tenantId, string merchantId, DateOnly date, decimal initialAmount)
     {
-        return new MerchantDailySummary
+        return new()
         {
             Id = Guid.NewGuid(),
             TenantId = tenantId,

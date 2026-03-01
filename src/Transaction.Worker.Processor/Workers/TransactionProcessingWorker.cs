@@ -13,43 +13,30 @@ using Transaction.Worker.Processor;
 
 namespace Transaction.Worker.Processor.Workers;
 
-public sealed class TransactionProcessingWorker : BackgroundService
+public sealed class TransactionProcessingWorker(
+    IServiceScopeFactory scopeFactory,
+    ServiceBusClient serviceBusClient,
+    IObservabilityManager observabilityManager,
+    IMetricRecorder metricRecorder,
+    IConfiguration configuration) : BackgroundService
 {
     private const int MaxRetries = 3;
 
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ServiceBusClient _serviceBusClient;
-    private readonly IObservabilityManager _observabilityManager;
-    private readonly IMetricRecorder _metricRecorder;
-    private readonly string _queueName;
+    private readonly string _queueName = configuration.GetValue<string>("ServiceBus:QueueName") ?? "transactions-ingest";
 
     private ServiceBusProcessor? _processor;
 
-    public TransactionProcessingWorker(
-        IServiceScopeFactory scopeFactory,
-        ServiceBusClient serviceBusClient,
-        IObservabilityManager observabilityManager,
-        IMetricRecorder metricRecorder,
-        IConfiguration configuration)
-    {
-        _scopeFactory = scopeFactory;
-        _serviceBusClient = serviceBusClient;
-        _observabilityManager = observabilityManager;
-        _metricRecorder = metricRecorder;
-        _queueName = configuration.GetValue<string>("ServiceBus:QueueName") ?? "transactions-ingest";
-    }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
 
-        ServiceBusProcessorOptions options = new ServiceBusProcessorOptions
+        ServiceBusProcessorOptions options = new()
         {
             MaxConcurrentCalls = 4,
             AutoCompleteMessages = false
         };
 
-        _processor = _serviceBusClient.CreateProcessor(_queueName, options);
+        _processor = serviceBusClient.CreateProcessor(_queueName, options);
         _processor.ProcessMessageAsync += OnMessageReceivedAsync;
         _processor.ProcessErrorAsync += OnErrorAsync;
 
@@ -69,12 +56,12 @@ public sealed class TransactionProcessingWorker : BackgroundService
             await _processor.DisposeAsync();
         }
 
-        _observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
     }
 
     private async Task OnMessageReceivedAsync(ProcessMessageEventArgs args)
     {
-        _observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
 
         Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -83,8 +70,8 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
         if (payload == null)
         {
-            _metricRecorder.Increment(MetricDefinitions.ServiceBusDeadLettered);
-            _observabilityManager.LogMessage(string.Format(LogMessages.FailedToDeserialiseMessage, args.Message.MessageId)).AsError();
+            metricRecorder.Increment(MetricDefinitions.ServiceBusDeadLettered);
+            observabilityManager.LogMessage(string.Format(LogMessages.FailedToDeserialiseMessage, args.Message.MessageId)).AsError();
             await args.DeadLetterMessageAsync(args.Message, ServiceBusReasons.DeserializationFailed, ServiceBusReasons.DeserializationFailedDescription);
             return;
         }
@@ -93,7 +80,7 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
         for (int attempt = 1; attempt <= MaxRetries; attempt++)
         {
-            await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+            await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
             unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
             IRuleEngine ruleEngine = scope.ServiceProvider.GetRequiredService<IRuleEngine>();
 
@@ -104,15 +91,15 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
                 if (transaction == null)
                 {
-                    _metricRecorder.Increment(MetricDefinitions.ServiceBusDeadLettered);
-                    _observabilityManager.LogMessage(string.Format(LogMessages.TransactionNotFoundDeadLetter, payload.TenantId, payload.TransactionId)).AsWarning();
+                    metricRecorder.Increment(MetricDefinitions.ServiceBusDeadLettered);
+                    observabilityManager.LogMessage(string.Format(LogMessages.TransactionNotFoundDeadLetter, payload.TenantId, payload.TransactionId)).AsWarning();
                     await args.DeadLetterMessageAsync(args.Message, ServiceBusReasons.NotFound, ServiceBusReasons.NotFoundDescription);
                     return;
                 }
 
                 if (transaction.Status != TransactionStatus.Received)
                 {
-                    _observabilityManager.LogMessage(string.Format(LogMessages.TransactionAlreadyProcessed, payload.TransactionId, transaction.Status)).AsInfo();
+                    observabilityManager.LogMessage(string.Format(LogMessages.TransactionAlreadyProcessed, payload.TransactionId, transaction.Status)).AsInfo();
                     await args.CompleteMessageAsync(args.Message);
                     return;
                 }
@@ -121,8 +108,8 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
                 if (tenant == null)
                 {
-                    _metricRecorder.Increment(MetricDefinitions.ServiceBusDeadLettered);
-                    _observabilityManager.LogMessage(string.Format(LogMessages.TenantNotFoundDeadLetter, payload.TenantId)).AsError();
+                    metricRecorder.Increment(MetricDefinitions.ServiceBusDeadLettered);
+                    observabilityManager.LogMessage(string.Format(LogMessages.TenantNotFoundDeadLetter, payload.TenantId)).AsError();
                     await args.DeadLetterMessageAsync(args.Message, ServiceBusReasons.TenantNotFound, string.Format(ServiceBusReasons.TenantNotFoundDescriptionFormat, payload.TenantId));
                     return;
                 }
@@ -138,9 +125,9 @@ public sealed class TransactionProcessingWorker : BackgroundService
                     transaction.TenantId, transaction.MerchantId, date, args.CancellationToken);
 
                 if (transaction.Type == TransactionType.Purchase)
-                    _metricRecorder.Increment(MetricDefinitions.DailyLimitChecks);
+                    metricRecorder.Increment(MetricDefinitions.DailyLimitChecks);
 
-                RuleContext ruleContext = new RuleContext(transaction, tenant, summary?.TotalAmount ?? 0m);
+                RuleContext ruleContext = new(transaction, tenant, summary?.TotalAmount ?? 0m);
                 IEnumerable<RuleResult> results = await ruleEngine.EvaluateAllAsync(ruleContext, args.CancellationToken);
 
                 RuleResult? failure = results.FirstOrDefault(r => !r.IsValid);
@@ -149,22 +136,22 @@ public sealed class TransactionProcessingWorker : BackgroundService
                 if (failure != null)
                 {
                     if (failure.ErrorMessage == RuleMessages.DailyMerchantLimitError)
-                        _metricRecorder.Increment(MetricDefinitions.DailyLimitExceeded);
+                        metricRecorder.Increment(MetricDefinitions.DailyLimitExceeded);
 
                     transaction.Reject(failure.ErrorMessage ?? string.Empty);
-                    _metricRecorder.Increment(MetricDefinitions.TransactionsRejected);
+                    metricRecorder.Increment(MetricDefinitions.TransactionsRejected);
                 }
                 else
                 {
                     if (review != null)
                     {
                         transaction.MarkForReview(review.ErrorMessage);
-                        _metricRecorder.Increment(MetricDefinitions.TransactionsInReview);
+                        metricRecorder.Increment(MetricDefinitions.TransactionsInReview);
                     }
                     else
                     {
                         transaction.Complete();
-                        _metricRecorder.Increment(MetricDefinitions.TransactionsProcessed);
+                        metricRecorder.Increment(MetricDefinitions.TransactionsProcessed);
                     }
 
                     if (transaction.Type == TransactionType.Purchase)
@@ -189,9 +176,9 @@ public sealed class TransactionProcessingWorker : BackgroundService
                 await unitOfWork.CommitTransactionAsync(args.CancellationToken);
 
                 stopwatch.Stop();
-                _metricRecorder.RecordDuration(MetricDefinitions.ProcessingDuration, stopwatch.ElapsedMilliseconds);
+                metricRecorder.RecordDuration(MetricDefinitions.ProcessingDuration, stopwatch.ElapsedMilliseconds);
 
-                _observabilityManager.LogMessage(string.Format(LogMessages.TransactionProcessed, transaction.TransactionId, transaction.Status)).AsInfo();
+                observabilityManager.LogMessage(string.Format(LogMessages.TransactionProcessed, transaction.TransactionId, transaction.Status)).AsInfo();
 
                 await args.CompleteMessageAsync(args.Message);
                 return;
@@ -199,15 +186,15 @@ public sealed class TransactionProcessingWorker : BackgroundService
             catch (DbUpdateConcurrencyException) when (attempt < MaxRetries)
             {
                 await unitOfWork.RollbackTransactionAsync(args.CancellationToken);
-                _metricRecorder.Increment(MetricDefinitions.ConcurrencyConflicts);
-                _observabilityManager.LogMessage(string.Format(LogMessages.ConcurrencyConflictRetry, payload.TransactionId, attempt, MaxRetries)).AsWarning();
+                metricRecorder.Increment(MetricDefinitions.ConcurrencyConflicts);
+                observabilityManager.LogMessage(string.Format(LogMessages.ConcurrencyConflictRetry, payload.TransactionId, attempt, MaxRetries)).AsWarning();
             }
             catch (DbUpdateConcurrencyException)
             {
                 await unitOfWork.RollbackTransactionAsync(args.CancellationToken);
-                _metricRecorder.Increment(MetricDefinitions.ConcurrencyConflicts);
-                _metricRecorder.Increment(MetricDefinitions.ServiceBusAbandoned);
-                _observabilityManager.LogMessage(string.Format(LogMessages.ConcurrencyConflictExhausted, payload.TransactionId)).AsError();
+                metricRecorder.Increment(MetricDefinitions.ConcurrencyConflicts);
+                metricRecorder.Increment(MetricDefinitions.ServiceBusAbandoned);
+                observabilityManager.LogMessage(string.Format(LogMessages.ConcurrencyConflictExhausted, payload.TransactionId)).AsError();
                 await args.AbandonMessageAsync(args.Message);
                 return;
             }
@@ -217,7 +204,7 @@ public sealed class TransactionProcessingWorker : BackgroundService
                 {
                     try { await unitOfWork.RollbackTransactionAsync(args.CancellationToken); } catch { /* ignore */ }
                 }
-                _metricRecorder.Increment(MetricDefinitions.ServiceBusAbandoned);
+                metricRecorder.Increment(MetricDefinitions.ServiceBusAbandoned);
                 await args.AbandonMessageAsync(args.Message);
                 return;
             }
@@ -227,8 +214,8 @@ public sealed class TransactionProcessingWorker : BackgroundService
                 {
                     try { await unitOfWork.RollbackTransactionAsync(args.CancellationToken); } catch { /* ignore */ }
                 }
-                _metricRecorder.Increment(MetricDefinitions.ServiceBusDeadLettered);
-                _observabilityManager.LogMessage(string.Format(LogMessages.UnexpectedErrorProcessingTransaction, payload.TransactionId, ex.Message)).AsError();
+                metricRecorder.Increment(MetricDefinitions.ServiceBusDeadLettered);
+                observabilityManager.LogMessage(string.Format(LogMessages.UnexpectedErrorProcessingTransaction, payload.TransactionId, ex.Message)).AsError();
                 await args.DeadLetterMessageAsync(args.Message, ServiceBusReasons.UnexpectedError, ex.Message);
                 return;
             }
@@ -237,7 +224,7 @@ public sealed class TransactionProcessingWorker : BackgroundService
 
     private Task OnErrorAsync(ProcessErrorEventArgs args)
     {
-        _observabilityManager.LogMessage(string.Format(LogMessages.ServiceBusError, args.ErrorSource, args.EntityPath, args.Exception.Message)).AsError();
+        observabilityManager.LogMessage(string.Format(LogMessages.ServiceBusError, args.ErrorSource, args.EntityPath, args.Exception.Message)).AsError();
         return Task.CompletedTask;
     }
 }

@@ -6,32 +6,19 @@ using Transaction.Infrastructure.Messaging;
 
 namespace Transaction.Worker.OutboxRelay.Workers;
 
-public sealed class OutboxRelayWorker : BackgroundService
+public sealed class OutboxRelayWorker(
+    IServiceScopeFactory scopeFactory,
+    IObservabilityManager observabilityManager,
+    IMetricRecorder metricRecorder,
+    IConfiguration configuration) : BackgroundService
 {
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IObservabilityManager _observabilityManager;
-    private readonly IMetricRecorder _metricRecorder;
-    private readonly int _batchSize;
-    private readonly TimeSpan _pollingInterval;
-    private readonly string _queueName;
-
-    public OutboxRelayWorker(
-        IServiceScopeFactory scopeFactory,
-        IObservabilityManager observabilityManager,
-        IMetricRecorder metricRecorder,
-        IConfiguration configuration)
-    {
-        _scopeFactory = scopeFactory;
-        _observabilityManager = observabilityManager;
-        _metricRecorder = metricRecorder;
-        _batchSize = configuration.GetValue<int>("OutboxRelay:BatchSize", 100);
-        _pollingInterval = TimeSpan.FromSeconds(configuration.GetValue<int>("OutboxRelay:PollingIntervalSeconds", 1));
-        _queueName = configuration.GetValue<string>("OutboxRelay:QueueName") ?? "transactions-ingest";
-    }
+    private readonly int _batchSize = configuration.GetValue<int>("OutboxRelay:BatchSize", 100);
+    private readonly TimeSpan _pollingInterval = TimeSpan.FromSeconds(configuration.GetValue<int>("OutboxRelay:PollingIntervalSeconds", 1));
+    private readonly string _queueName = configuration.GetValue<string>("OutboxRelay:QueueName") ?? "transactions-ingest";
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -45,19 +32,19 @@ public sealed class OutboxRelayWorker : BackgroundService
             }
             catch (Exception ex)
             {
-                _metricRecorder.Increment(MetricDefinitions.OutboxRelayErrors);
-                _observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayUnexpectedError, ex.Message)).AsError();
+                metricRecorder.Increment(MetricDefinitions.OutboxRelayErrors);
+                observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayUnexpectedError, ex.Message)).AsError();
             }
 
             await Task.Delay(_pollingInterval, stoppingToken);
         }
 
-        _observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
     }
 
     private async Task ProcessBatchAsync(CancellationToken cancellationToken)
     {
-        await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
+        await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
 
         IUnitOfWork unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         IServiceBusPublisher publisher = scope.ServiceProvider.GetRequiredService<IServiceBusPublisher>();
@@ -70,7 +57,7 @@ public sealed class OutboxRelayWorker : BackgroundService
             return;
         }
 
-        _observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayingMessages, messages.Count, _queueName)).AsInfo();
+        observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayingMessages, messages.Count, _queueName)).AsInfo();
 
         foreach (OutboxMessage message in messages)
         {
@@ -83,7 +70,7 @@ public sealed class OutboxRelayWorker : BackgroundService
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _metricRecorder.Increment(MetricDefinitions.OutboxMessagesRelayed, messages.Count);
-        _observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayedMessages, messages.Count)).AsInfo();
+        metricRecorder.Increment(MetricDefinitions.OutboxMessagesRelayed, messages.Count);
+        observabilityManager.LogMessage(string.Format(LogMessages.OutboxRelayedMessages, messages.Count)).AsInfo();
     }
 }

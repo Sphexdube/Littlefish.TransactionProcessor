@@ -9,30 +9,23 @@ using Transaction.Domain.Observability.Contracts;
 
 namespace Transaction.Application.Handlers.Request.V1;
 
-public sealed class GetDailySummaryHandler : IRequestHandler<GetDailySummaryQuery, DailySummaryResponse>
+public sealed class GetDailySummaryHandler(
+    IUnitOfWork unitOfWork,
+    IObservabilityManager observabilityManager) : IRequestHandler<GetDailySummaryQuery, DailySummaryResponse>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IObservabilityManager _observabilityManager;
-
-    public GetDailySummaryHandler(IUnitOfWork unitOfWork, IObservabilityManager observabilityManager)
-    {
-        _unitOfWork = unitOfWork;
-        _observabilityManager = observabilityManager;
-    }
-
     public async Task<DailySummaryResponse> HandleAsync(GetDailySummaryQuery query, CancellationToken cancellationToken = default)
     {
-        _observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
 
-        MerchantDailySummary? summary = await _unitOfWork.MerchantDailySummaries.GetByMerchantAndDateAsync(
+        MerchantDailySummary? summary = await unitOfWork.MerchantDailySummaries.GetByMerchantAndDateAsync(
             query.TenantId, query.MerchantId, query.Date, cancellationToken);
 
         if (summary == null)
             throw new NotFoundException(ErrorMessages.DailySummaryNotFound);
 
-        _observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
 
-        return new DailySummaryResponse
+        return new()
         {
             MerchantId = summary.MerchantId,
             Date = summary.Date,

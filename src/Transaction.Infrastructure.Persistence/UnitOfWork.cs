@@ -5,9 +5,8 @@ using Transaction.Infrastructure.Persistence.Repositories;
 
 namespace Transaction.Infrastructure.Persistence;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork(TransactionDbContext context) : IUnitOfWork
 {
-    private readonly TransactionDbContext _context;
     private IDbContextTransaction? _transaction;
 
     private ITransactionRepository? _transactions;
@@ -17,33 +16,28 @@ public class UnitOfWork : IUnitOfWork
     private IOutboxMessageRepository? _outboxMessages;
 
     public ITransactionRepository Transactions =>
-        _transactions ??= new TransactionRepository(_context);
+        _transactions ??= new TransactionRepository(context);
 
     public IBatchRepository Batches =>
-        _batches ??= new BatchRepository(_context);
+        _batches ??= new BatchRepository(context);
 
     public ITenantRepository Tenants =>
-        _tenants ??= new TenantRepository(_context);
+        _tenants ??= new TenantRepository(context);
 
     public IMerchantDailySummaryRepository MerchantDailySummaries =>
-        _merchantDailySummaries ??= new MerchantDailySummaryRepository(_context);
+        _merchantDailySummaries ??= new MerchantDailySummaryRepository(context);
 
     public IOutboxMessageRepository OutboxMessages =>
-        _outboxMessages ??= new OutboxMessageRepository(_context);
-
-    public UnitOfWork(TransactionDbContext context)
-    {
-        _context = context;
-    }
+        _outboxMessages ??= new OutboxMessageRepository(context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.SaveChangesAsync(cancellationToken);
+        return await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
-        _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        _transaction = await context.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
@@ -69,6 +63,6 @@ public class UnitOfWork : IUnitOfWork
     public void Dispose()
     {
         _transaction?.Dispose();
-        _context.Dispose();
+        context.Dispose();
     }
 }

@@ -4,10 +4,7 @@ using Transaction.Infrastructure.Persistence.Context;
 
 namespace Transaction.Infrastructure.Persistence.Repositories;
 
-public class BatchRepository : Repository<Batch, Guid>, IBatchRepository
+public class BatchRepository(TransactionDbContext context)
+    : Repository<Batch, Guid>(context), IBatchRepository
 {
-    public BatchRepository(TransactionDbContext context)
-        : base(context)
-    {
-    }
 }

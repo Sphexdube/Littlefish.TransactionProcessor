@@ -18,7 +18,7 @@ public sealed class IngestTransactionBatchRequestBuilder : BuilderBase<IngestTra
 
     public static IList<TransactionItemRequest> GenerateTransactions(int count)
     {
-        List<TransactionItemRequest> transactions = new List<TransactionItemRequest>();
+        List<TransactionItemRequest> transactions = new();
 
         for (int i = 0; i < count; i++)
         {

@@ -12,39 +12,31 @@ using Transaction.Domain.Observability.Contracts;
 
 namespace Transaction.Application.Handlers.Request.V1;
 
-public sealed class IngestBatchHandler : IRequestHandler<IngestBatchCommand, IngestBatchResponse>
+public sealed class IngestBatchHandler(
+    IUnitOfWork unitOfWork,
+    IObservabilityManager observabilityManager,
+    IMetricRecorder metricRecorder) : IRequestHandler<IngestBatchCommand, IngestBatchResponse>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IObservabilityManager _observabilityManager;
-    private readonly IMetricRecorder _metricRecorder;
-
-    public IngestBatchHandler(IUnitOfWork unitOfWork, IObservabilityManager observabilityManager, IMetricRecorder metricRecorder)
-    {
-        _unitOfWork = unitOfWork;
-        _observabilityManager = observabilityManager;
-        _metricRecorder = metricRecorder;
-    }
-
     public async Task<IngestBatchResponse> HandleAsync(IngestBatchCommand command, CancellationToken cancellationToken = default)
     {
-        _observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodStarted).AsInfo();
 
-        if (await _unitOfWork.Tenants.GetByIdAsync(command.TenantId, cancellationToken) == null)
+        if (await unitOfWork.Tenants.GetByIdAsync(command.TenantId, cancellationToken) == null)
             throw new NotFoundException(ErrorMessages.TenantNotFound);
 
-        List<TransactionValidationError> errors = new List<TransactionValidationError>();
+        List<TransactionValidationError> errors = new();
         int acceptedCount = 0;
         int rejectedCount = 0;
 
         Batch batch = Batch.Create(command.TenantId, command.Transactions.Count, command.CorrelationId);
 
-        await _unitOfWork.Batches.AddAsync(batch, cancellationToken);
+        await unitOfWork.Batches.AddAsync(batch, cancellationToken);
 
         foreach (TransactionItemCommand item in command.Transactions)
         {
-            if (await _unitOfWork.Transactions.ExistsByTransactionIdAsync(command.TenantId, item.TransactionId, cancellationToken))
+            if (await unitOfWork.Transactions.ExistsByTransactionIdAsync(command.TenantId, item.TransactionId, cancellationToken))
             {
-                errors.Add(new TransactionValidationError
+                errors.Add(new()
                 {
                     TransactionId = item.TransactionId,
                     ErrorMessage = ErrorMessages.DuplicateTransactionId
@@ -67,9 +59,9 @@ public sealed class IngestBatchHandler : IRequestHandler<IngestBatchCommand, Ing
                 item.OccurredAt,
                 item.Metadata != null ? JsonSerializer.Serialize(item.Metadata) : null);
 
-            await _unitOfWork.Transactions.AddAsync(transaction, cancellationToken);
+            await unitOfWork.Transactions.AddAsync(transaction, cancellationToken);
 
-            TransactionMessagePayload payload = new TransactionMessagePayload
+            TransactionMessagePayload payload = new()
             {
                 TenantId = command.TenantId,
                 TransactionId = item.TransactionId,
@@ -90,24 +82,24 @@ public sealed class IngestBatchHandler : IRequestHandler<IngestBatchCommand, Ing
                 item.TransactionId,
                 JsonSerializer.Serialize(payload));
 
-            await _unitOfWork.OutboxMessages.AddAsync(outboxMessage, cancellationToken);
+            await unitOfWork.OutboxMessages.AddAsync(outboxMessage, cancellationToken);
 
             acceptedCount++;
         }
 
         batch.UpdateCounts(acceptedCount, rejectedCount, acceptedCount);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _metricRecorder.Increment(MetricDefinitions.BatchesReceived);
-        _metricRecorder.Increment(MetricDefinitions.TransactionsIngested, acceptedCount);
+        metricRecorder.Increment(MetricDefinitions.BatchesReceived);
+        metricRecorder.Increment(MetricDefinitions.TransactionsIngested, acceptedCount);
 
         if (rejectedCount > 0)
-            _metricRecorder.Increment(MetricDefinitions.TransactionsRejected, rejectedCount);
+            metricRecorder.Increment(MetricDefinitions.TransactionsRejected, rejectedCount);
 
-        _observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
+        observabilityManager.LogMessage(InfoMessages.MethodCompleted).AsInfo();
 
-        return new IngestBatchResponse
+        return new()
         {
             BatchId = batch.Id,
             AcceptedCount = acceptedCount,

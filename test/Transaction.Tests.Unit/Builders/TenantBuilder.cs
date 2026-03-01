@@ -3,10 +3,8 @@ using Transaction.Tests.Unit.Models;
 
 namespace Transaction.Tests.Unit.Builders;
 
-public sealed class TenantBuilder : BuilderBase<Tenant>
+public sealed class TenantBuilder() : BuilderBase<Tenant>(new Tenant())
 {
-    public TenantBuilder() : base(new Tenant()) { }
-
     public TenantBuilder WithId(Guid id) =>
         (TenantBuilder)With(x => x.Id, id);
 

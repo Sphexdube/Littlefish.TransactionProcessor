@@ -5,22 +5,13 @@ using Transaction.Domain.Interfaces;
 
 namespace Transaction.Domain.Rules;
 
-public sealed class RulesEngineAdapter : IRuleEngine
+public sealed class RulesEngineAdapter(
+    ITransactionRepository transactionRepository,
+    IRuleWorkflowRepository ruleWorkflowRepository) : IRuleEngine
 {
-    private readonly ITransactionRepository _transactionRepository;
-    private readonly IRuleWorkflowRepository _ruleWorkflowRepository;
-
-    public RulesEngineAdapter(
-        ITransactionRepository transactionRepository,
-        IRuleWorkflowRepository ruleWorkflowRepository)
-    {
-        _transactionRepository = transactionRepository;
-        _ruleWorkflowRepository = ruleWorkflowRepository;
-    }
-
     public async Task<IEnumerable<RuleResult>> EvaluateAllAsync(RuleContext context, CancellationToken cancellationToken = default)
     {
-        RuleWorkflow? workflow = await _ruleWorkflowRepository.GetByNameAsync(RuleMessages.TransactionRulesWorkflow, cancellationToken);
+        RuleWorkflow? workflow = await ruleWorkflowRepository.GetByNameAsync(RuleMessages.TransactionRulesWorkflow, cancellationToken);
 
         if (workflow == null)
         {
@@ -34,13 +25,13 @@ public sealed class RulesEngineAdapter : IRuleEngine
         if (context.Transaction.Type == TransactionType.Refund &&
             !string.IsNullOrWhiteSpace(context.Transaction.OriginalTransactionId))
         {
-            originalPurchaseExists = await _transactionRepository.ExistsByTransactionIdAsync(
+            originalPurchaseExists = await transactionRepository.ExistsByTransactionIdAsync(
                 context.Transaction.TenantId,
                 context.Transaction.OriginalTransactionId,
                 cancellationToken);
         }
 
-        TransactionRuleInput input = new TransactionRuleInput
+        TransactionRuleInput input = new()
         {
             TransactionType = context.Transaction.Type.ToString(),
             Amount = context.Transaction.Amount,
@@ -52,7 +43,7 @@ public sealed class RulesEngineAdapter : IRuleEngine
 
         List<RuleResultTree> ruleResults = await rulesEngine.ExecuteAllRulesAsync(RuleMessages.TransactionRulesWorkflow, input);
 
-        List<RuleResult> results = new List<RuleResult>();
+        List<RuleResult> results = new();
 
         foreach (RuleResultTree result in ruleResults)
         {
@@ -91,14 +82,14 @@ public sealed class RulesEngineAdapter : IRuleEngine
             })
             .ToList();
 
-        Workflow[] workflows = new Workflow[]
-        {
-            new Workflow
+        Workflow[] workflows =
+        [
+            new()
             {
                 WorkflowName = workflow.Name,
                 Rules = rules
             }
-        };
+        ];
 
         return new RulesEngine.RulesEngine(workflows);
     }

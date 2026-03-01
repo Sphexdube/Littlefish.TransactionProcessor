@@ -8,7 +8,7 @@ public sealed record IngestTransactionBatchRequest
 
     public IngestBatchCommand BuildCommand(Guid tenantId, string correlationId)
     {
-        return new IngestBatchCommand
+        return new()
         {
             TenantId = tenantId,
             CorrelationId = correlationId,

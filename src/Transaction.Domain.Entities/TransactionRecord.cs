@@ -49,7 +49,7 @@ public sealed class TransactionRecord : Entity<Guid>
         DateTimeOffset occurredAt,
         string? metadata)
     {
-        return new TransactionRecord
+        return new()
         {
             Id = Guid.NewGuid(),
             TenantId = tenantId,

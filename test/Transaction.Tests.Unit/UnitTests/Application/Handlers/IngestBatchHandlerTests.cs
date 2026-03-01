@@ -182,7 +182,7 @@ public sealed class IngestBatchHandlerTests
         IUnitOfWork mockUnitOfWork = Substitute.For<IUnitOfWork>();
         mockUnitOfWork.Tenants.Returns(mockTenantRepo);
 
-        IngestBatchHandler handler = new IngestBatchHandler(mockUnitOfWork, Substitute.For<IObservabilityManager>(), Substitute.For<IMetricRecorder>());
+        IngestBatchHandler handler = new(mockUnitOfWork, Substitute.For<IObservabilityManager>(), Substitute.For<IMetricRecorder>());
 
         IngestBatchCommand command = new IngestTransactionBatchRequest
         {

@@ -18,7 +18,7 @@ public sealed class OutboxMessage : Entity<Guid>
 
     public static OutboxMessage Create(Guid id, Guid tenantId, string transactionId, string payload)
     {
-        return new OutboxMessage
+        return new()
         {
             Id = id,
             TenantId = tenantId,
